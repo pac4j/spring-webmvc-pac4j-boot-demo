@@ -53,7 +53,7 @@ public class Application {
         map.put("urlFacebook", (String) fbClient.getRedirectAction(context, false).getLocation());
         map.put("urlTwitter", (String) twClient.getRedirectAction(context, false).getLocation());
         map.put("urlForm", (String) formClient.getRedirectAction(context, false).getLocation());
-        map.put("urlBa", (String) baClient.getRedirectAction(context, false).getLocation());
+        map.put("urlBasicAuth", (String) baClient.getRedirectAction(context, false).getLocation());
         map.put("urlCas", (String) casClient.getRedirectAction(context, false).getLocation());
         map.put("urlSaml", (String) saml2Client.getRedirectAction(context, false).getLocation());
         map.put("urlOidc", (String) oidcClient.getRedirectAction(context, false).getLocation());
@@ -77,6 +77,13 @@ public class Application {
     @RequestMapping("/facebook/index.html")
     public String facebook(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         return protectedIndex(request, response, map);
+    }
+
+    @RequestMapping("/facebook/notprotected.html")
+    public String facebookNotProtected(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
+        final WebContext context = new J2EContext(request, response);
+        map.put("profile", getStringProfile(context));
+        return "notProtected";
     }
 
     @RequestMapping("/facebookadmin/index.html")

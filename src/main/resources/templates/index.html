@@ -1,5 +1,6 @@
 <h1>index</h1>
 <a href="/facebook/index.html">Protected url by Facebook: facebook/index.html</a><br />
+<a href="facebook/notprotected.html">Not protected page: facebook/notprotected.html</a><br />
 <a href="/facebookadmin/index.html">Protected url by Facebook with ROLE_ADMIN: facebookadmin/index.html</a><br />
 <a href="/facebookcustom/index.html">Protected url by Facebook with custom authorizer (= must be a <em>HttpProfile</em> where the username starts with "jle"): facebookcustom/index.html</a><br />
 <a href="/twitter/index.html">Protected url by Twitter: twitter/index.html</a> or <a href="/twitter/index.html?client_name=FacebookClient">by Facebook: twitter/index.html?client_name=FacebookClient</a><br />
@@ -20,10 +21,10 @@ profile : {{profile}}
 <br /><br />
 <hr />
 
-<a href="${urlFacebook}">Authenticate with Facebook</a><br />
-<a href="${urlTwitter}">Authenticate with Twitter</a><br />
-<a href="${urlForm}">Authenticate with form</a><br />
-<a href="${urlBasicAuth}">Authenticate with basic auth</a><br />
-<a href="${urlCas}">Authenticate with CAS</a><br />
-<a href="${urlSaml}">Authenticate with SAML</a><br />
-<a href="${urlOidc}">Authenticate with OpenID Connect</a><br />
+<a href="{{urlFacebook}}">Authenticate with Facebook</a><br />
+<a href="{{urlTwitter}}">Authenticate with Twitter</a><br />
+<a href="{{urlForm}}">Authenticate with form</a><br />
+<a href="{{urlBasicAuth}}">Authenticate with basic auth</a><br />
+<a href="{{urlCas}}">Authenticate with CAS</a><br />
+<a href="{{urlSaml}}">Authenticate with SAML</a><br />
+<a href="{{urlOidc}}">Authenticate with OpenID Connect</a><br />
