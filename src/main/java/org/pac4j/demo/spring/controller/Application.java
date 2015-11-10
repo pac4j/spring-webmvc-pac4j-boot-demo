@@ -43,13 +43,13 @@ public class Application {
         final WebContext context = new J2EContext(request, response);
         map.put("profile", getStringProfile(context));
         final Clients clients = config.getClients();
-        final FacebookClient fbClient = (FacebookClient) clients.findClient("FacebookClient");
-        final TwitterClient twClient = (TwitterClient) clients.findClient("TwitterClient");
-        final FormClient formClient = (FormClient) clients.findClient("FormClient");
-        final IndirectBasicAuthClient baClient = (IndirectBasicAuthClient) clients.findClient("IndirectBasicAuthClient");
-        final CasClient casClient = (CasClient) clients.findClient("CasClient");
-        final SAML2Client saml2Client = (SAML2Client) clients.findClient("SAML2Client");
-        final OidcClient oidcClient = (OidcClient) clients.findClient("OidcClient");
+        final FacebookClient fbClient = (FacebookClient) clients.findClient(context, "FacebookClient");
+        final TwitterClient twClient = (TwitterClient) clients.findClient(context, "TwitterClient");
+        final FormClient formClient = (FormClient) clients.findClient(context, "FormClient");
+        final IndirectBasicAuthClient baClient = (IndirectBasicAuthClient) clients.findClient(context, "IndirectBasicAuthClient");
+        final CasClient casClient = (CasClient) clients.findClient(context, "CasClient");
+        final SAML2Client saml2Client = (SAML2Client) clients.findClient(context, "SAML2Client");
+        final OidcClient oidcClient = (OidcClient) clients.findClient(context, "OidcClient");
         map.put("urlFacebook", (String) fbClient.getRedirectAction(context, false).getLocation());
         map.put("urlTwitter", (String) twClient.getRedirectAction(context, false).getLocation());
         map.put("urlForm", (String) formClient.getRedirectAction(context, false).getLocation());
@@ -155,8 +155,9 @@ public class Application {
     }
 
     @RequestMapping("/theForm")
-    public String theForm(Map<String, Object> map) {
-        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient");
+    public String theForm(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
+        final WebContext context = new J2EContext(request, response);
+        final FormClient formClient = (FormClient) config.getClients().findClient(context, "FormClient");
         map.put("callbackUrl", formClient.getCallbackUrl());
         return "form";
     }
