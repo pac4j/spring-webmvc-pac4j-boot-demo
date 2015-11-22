@@ -50,15 +50,12 @@ public class Pac4jConfig {
         final TwitterClient twitterClient = new TwitterClient("CoxUiYwQOSFDReZYdjigBA",
                 "2kAzunH5Btc4gRSaMr7D7MkyoJ5u1VzbOOzE8rBofs");
         // HTTP
-        final FormClient formClient = new FormClient("http://localhost:8080/theForm.jsp", new SimpleTestUsernamePasswordAuthenticator());
+        final FormClient formClient = new FormClient("http://localhost:8080/loginForm.jsp", new SimpleTestUsernamePasswordAuthenticator());
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
-        final CasClient casClient = new CasClient();
+        final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
         // casClient.setGateway(true);
-        casClient.setCasLoginUrl("http://localhost:8888/cas/login");
-        casClient.setCasProtocol(CasClient.CasProtocol.CAS20);
-        casClient.setLogoutHandler(new CasSingleSignOutHandler());
 
         // REST authent with JWT for a token passed in the url as the token parameter
         ParameterClient parameterClient = new ParameterClient("token", new JwtAuthenticator(salt));
