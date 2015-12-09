@@ -1,5 +1,6 @@
 package org.pac4j.demo.spring.config;
 
+import com.nimbusds.jose.JWSAlgorithm;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.logout.CasSingleSignOutHandler;
 import org.pac4j.core.authorization.RequireAnyRoleAuthorizer;
@@ -35,15 +36,16 @@ public class Pac4jConfig {
         oidcClient.setClientID("343992089165-sp0l1km383i8cbm2j5nn20kbk5dk8hor.apps.googleusercontent.com");
         oidcClient.setSecret("uR3D8ej1kIRPbqAFaxIE3HWh");
         oidcClient.setDiscoveryURI("https://accounts.google.com/.well-known/openid-configuration");
+        oidcClient.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
         oidcClient.addCustomParam("prompt", "consent");
 
         final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration("resource:samlKeystore.jks",
                 "pac4j-demo-passwd",
                 "pac4j-demo-passwd",
-                "resource:testshib-providers.xml");
+                "resource:metadata-okta.xml");
         cfg.setMaximumAuthenticationLifetime(3600);
-        cfg.setServiceProviderEntityId("urn:mace:saml:pac4j.org");
-        cfg.setServiceProviderMetadataPath(new File("target", "sp-metadata.xml").getAbsolutePath());
+        cfg.setServiceProviderEntityId("http://localhost:8080/callback?client_name=SAML2Client");
+        cfg.setServiceProviderMetadataPath("sp-metadata.xml");
         final SAML2Client saml2Client = new SAML2Client(cfg);
 
         final FacebookClient facebookClient = new FacebookClient("145278422258960", "be21409ba8f39b5dae2a7de525484da8");
