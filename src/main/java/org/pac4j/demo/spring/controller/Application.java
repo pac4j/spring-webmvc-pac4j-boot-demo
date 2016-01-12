@@ -1,7 +1,5 @@
 package org.pac4j.demo.spring.controller;
 
-import org.pac4j.cas.client.CasClient;
-import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
@@ -9,12 +7,7 @@ import org.pac4j.core.exception.RequiresHttpAction;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.http.client.indirect.FormClient;
-import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.jwt.profile.JwtGenerator;
-import org.pac4j.oauth.client.FacebookClient;
-import org.pac4j.oauth.client.TwitterClient;
-import org.pac4j.oidc.client.OidcClient;
-import org.pac4j.saml.client.SAML2Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -42,21 +35,6 @@ public class Application {
     public String index(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws RequiresHttpAction {
         final WebContext context = new J2EContext(request, response);
         map.put("profile", getStringProfile(context));
-        final Clients clients = config.getClients();
-        final FacebookClient fbClient = (FacebookClient) clients.findClient("FacebookClient");
-        final TwitterClient twClient = (TwitterClient) clients.findClient("TwitterClient");
-        final FormClient formClient = (FormClient) clients.findClient("FormClient");
-        final IndirectBasicAuthClient baClient = (IndirectBasicAuthClient) clients.findClient("IndirectBasicAuthClient");
-        final CasClient casClient = (CasClient) clients.findClient("CasClient");
-        final SAML2Client saml2Client = (SAML2Client) clients.findClient("SAML2Client");
-        final OidcClient oidcClient = (OidcClient) clients.findClient("OidcClient");
-        map.put("urlFacebook", (String) fbClient.getRedirectAction(context, false).getLocation());
-        map.put("urlTwitter", (String) twClient.getRedirectAction(context, false).getLocation());
-        map.put("urlForm", (String) formClient.getRedirectAction(context, false).getLocation());
-        map.put("urlBasicAuth", (String) baClient.getRedirectAction(context, false).getLocation());
-        map.put("urlCas", (String) casClient.getRedirectAction(context, false).getLocation());
-        map.put("urlSaml", (String) saml2Client.getRedirectAction(context, false).getLocation());
-        map.put("urlOidc", (String) oidcClient.getRedirectAction(context, false).getLocation());
         return "index";
     }
 
