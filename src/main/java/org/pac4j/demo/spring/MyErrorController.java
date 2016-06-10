@@ -1,26 +1,31 @@
-package org.pac4j.demo.spring.controller;
+package org.pac4j.demo.spring;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.BasicErrorController;
-import org.springframework.boot.autoconfigure.web.DefaultErrorAttributes;
+import org.springframework.boot.autoconfigure.web.ErrorAttributes;
+import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
+@RequestMapping({"${server.error.path:${error.path:/error}}"})
 public class MyErrorController extends BasicErrorController {
 
-    public MyErrorController() {
-        super(new DefaultErrorAttributes());
+    @Autowired
+    public MyErrorController(ErrorAttributes errorAttributes) {
+        super(errorAttributes, new ErrorProperties());
     }
 
     @RequestMapping(
-            value = {"${error.path:/error}"},
             produces = {"text/html"}
     )
-    public ModelAndView errorHtml(HttpServletRequest request) {
+    @Override
+    public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
         final HttpStatus status = getStatus(request);
         if (status == HttpStatus.UNAUTHORIZED) {
             return new ModelAndView("error401");
@@ -29,16 +34,5 @@ public class MyErrorController extends BasicErrorController {
         } else {
             return new ModelAndView("error500");
         }
-    }
-
-    private HttpStatus getStatus(HttpServletRequest request) {
-        Integer statusCode = (Integer)request.getAttribute("javax.servlet.error.status_code");
-        if(statusCode != null) {
-            try {
-                return HttpStatus.valueOf(statusCode.intValue());
-            } catch (Exception e) {
-            }
-        }
-        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }
