@@ -1,11 +1,13 @@
-package org.pac4j.demo.spring.controller;
+package org.pac4j.demo.spring;
 
+import org.pac4j.core.client.Client;
+import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.WebContext;
-import org.pac4j.core.exception.RequiresHttpAction;
+import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
-import org.pac4j.core.profile.UserProfile;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jwt.profile.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,41 +17,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class Application {
 
-    @Autowired
-    private Config config;
-
     @Value("${salt}")
     private String salt;
 
+    @Autowired
+    private Config config;
+
     @RequestMapping("/")
-    public String root(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws RequiresHttpAction {
+    public String root(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws HttpAction {
         return index(request, response, map);
     }
 
     @RequestMapping("/index.html")
-    public String index(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws RequiresHttpAction {
+    public String index(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws HttpAction {
         final WebContext context = new J2EContext(request, response);
-        map.put("profile", getStringProfile(context));
+        map.put("profiles", getProfiles(context));
         return "index";
     }
 
-    private UserProfile getProfile(WebContext context) {
+    private List<CommonProfile> getProfiles(final WebContext context) {
         final ProfileManager manager = new ProfileManager(context);
-        return manager.get(true);
-    }
-
-    private String getStringProfile(WebContext context) {
-        final UserProfile profile = getProfile(context);
-        if (profile == null) {
-            return "";
-        } else {
-            return profile.toString();
-        }
+        return manager.getAll(true);
     }
 
     @RequestMapping("/facebook/index.html")
@@ -60,7 +55,7 @@ public class Application {
     @RequestMapping("/facebook/notprotected.html")
     public String facebookNotProtected(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         final WebContext context = new J2EContext(request, response);
-        map.put("profile", getStringProfile(context));
+        map.put("profiles", getProfiles(context));
         return "notProtected";
     }
 
@@ -94,6 +89,11 @@ public class Application {
         return protectedIndex(request, response, map);
     }
 
+    @RequestMapping("/casrest/index.html")
+    public String casrest(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
+        return protectedIndex(request, response, map);
+    }
+
     @RequestMapping("/saml/index.html")
     public String saml(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         return protectedIndex(request, response, map);
@@ -121,27 +121,40 @@ public class Application {
 
     @RequestMapping("/jwt.html")
     public String jwt(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
-        final WebContext context = new J2EContext(request, response);
-        final UserProfile profile = getProfile(context);
         final JwtGenerator generator = new JwtGenerator(salt);
+        final WebContext context = new J2EContext(request, response);
         String token = "";
-        if (profile != null) {
-            token = generator.generate(profile);
+        final ProfileManager manager = new ProfileManager(context);
+        final Optional<CommonProfile> profile = manager.get(true);
+        if (profile.isPresent()) {
+            token = generator.generate(profile.get());
         }
         map.put("token", token);
         return "jwt";
     }
 
     @RequestMapping("/loginForm")
-    public String theForm(Map<String, Object> map) {
-        final FormClient formClient = (FormClient) config.getClients().findClient( "FormClient");
+    public String loginForm(Map<String, Object> map) {
+        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient");
         map.put("callbackUrl", formClient.getCallbackUrl());
         return "form";
     }
 
+    @RequestMapping("/forceLogin")
+    public String forceLogin(HttpServletRequest request, HttpServletResponse response) {
+
+        final J2EContext context = new J2EContext(request, response);
+        final Client client = config.getClients().findClient(request.getParameter(Clients.DEFAULT_CLIENT_NAME_PARAMETER));
+        try {
+            client.redirect(context);
+        } catch (final HttpAction e) {
+        }
+        return null;
+    }
+
     protected String protectedIndex(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) {
         final WebContext context = new J2EContext(request, response);
-        map.put("profile", getStringProfile(context));
+        map.put("profiles", getProfiles(context));
         return "protectedIndex";
     }
 }
