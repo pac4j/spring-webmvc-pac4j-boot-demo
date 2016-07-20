@@ -33,6 +33,7 @@ public class Pac4jConfig {
         oidcClient.setSecret("MhMme_Ik6IH2JMnAT6MFIfee");
         oidcClient.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
         oidcClient.addCustomParam("prompt", "consent");
+        oidcClient.setAuthorizationGenerator(profile -> profile.addRole("ROLE_ADMIN"));
 
         final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration("resource:samlKeystore.jks",
                 "pac4j-demo-passwd",
