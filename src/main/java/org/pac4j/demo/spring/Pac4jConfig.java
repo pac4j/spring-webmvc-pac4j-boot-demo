@@ -14,6 +14,7 @@ import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
+import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,11 +29,22 @@ public class Pac4jConfig {
 
     @Bean
     public Config config() {
+        /*With local IdentityServer3.Samples/source/AspNet5/src/IdentityServer for tests:
+        final OidcConfiguration oidcConfiguration = new OidcConfiguration();
+        oidcConfiguration.setClientId("test");
+        oidcConfiguration.setSecret("6A23B244-5713-4A25-5E68-61B6B8A5E131");
+        oidcConfiguration.setClientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+        oidcConfiguration.setDiscoveryURI("http://localhost:5000/.well-known/openid-configuration");
+        oidcConfiguration.setScope("openid");
+        final OidcClient oidcClient = new OidcClient(oidcConfiguration);
+        oidcClient.setName("GoogleOidcClient");*/
+
+        final OidcConfiguration oidcConfiguration = new OidcConfiguration();
+        oidcConfiguration.setClientId("167480702619-8e1lo80dnu8bpk3k0lvvj27noin97vu9.apps.googleusercontent.com");
+        oidcConfiguration.setSecret("MhMme_Ik6IH2JMnAT6MFIfee");
+        oidcConfiguration.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
+        oidcConfiguration.addCustomParam("prompt", "consent");
         final GoogleOidcClient oidcClient = new GoogleOidcClient();
-        oidcClient.setClientID("167480702619-8e1lo80dnu8bpk3k0lvvj27noin97vu9.apps.googleusercontent.com");
-        oidcClient.setSecret("MhMme_Ik6IH2JMnAT6MFIfee");
-        oidcClient.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
-        oidcClient.addCustomParam("prompt", "consent");
         oidcClient.setAuthorizationGenerator(profile -> profile.addRole("ROLE_ADMIN"));
 
         final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration("resource:samlKeystore.jks",
