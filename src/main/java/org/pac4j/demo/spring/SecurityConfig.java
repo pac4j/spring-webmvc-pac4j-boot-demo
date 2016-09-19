@@ -25,7 +25,7 @@ public class SecurityConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(new SecurityInterceptor(config, "IndirectBasicAuthClient")).addPathPatterns("/basicauth/*");
         registry.addInterceptor(new SecurityInterceptor(config, "CasClient")).addPathPatterns("/cas/*");
         registry.addInterceptor(new SecurityInterceptor(config, "SAML2Client")).addPathPatterns("/saml/*");
-        registry.addInterceptor(new SecurityInterceptor(config, "test")).addPathPatterns("/oidc/*");
+        registry.addInterceptor(new SecurityInterceptor(config, "GoogleOidcClient")).addPathPatterns("/oidc/*");
         registry.addInterceptor(new SecurityInterceptor(config)).addPathPatterns("/protected/*");
         registry.addInterceptor(new SecurityInterceptor(config, "DirectBasicAuthClient,ParameterClient")).addPathPatterns("/dba/*");
         registry.addInterceptor(new SecurityInterceptor(config, "ParameterClient")).addPathPatterns("/rest-jwt/*");
