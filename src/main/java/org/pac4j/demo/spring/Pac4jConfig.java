@@ -2,6 +2,7 @@ package org.pac4j.demo.spring;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import org.pac4j.cas.client.CasClient;
+import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
@@ -10,6 +11,8 @@ import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.http.client.indirect.IndirectBasicAuthClient;
 import org.pac4j.http.credentials.authenticator.test.SimpleTestUsernamePasswordAuthenticator;
+import org.pac4j.jwt.config.encryption.SecretEncryptionConfiguration;
+import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
@@ -66,11 +69,17 @@ public class Pac4jConfig {
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
-        final CasClient casClient = new CasClient("https://casserverpac4j.herokuapp.com/login");
+        final CasConfiguration configuration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
+        final CasClient casClient = new CasClient(configuration);
         // casClient.setGateway(true);
 
         // REST authent with JWT for a token passed in the url as the token parameter
-        ParameterClient parameterClient = new ParameterClient("token", new JwtAuthenticator(salt));
+        final SecretSignatureConfiguration secretSignatureConfiguration = new SecretSignatureConfiguration(salt);
+        final SecretEncryptionConfiguration secretEncryptionConfiguration = new SecretEncryptionConfiguration(salt);
+        final JwtAuthenticator authenticator = new JwtAuthenticator();
+        authenticator.setSignatureConfiguration(secretSignatureConfiguration);
+        authenticator.setEncryptionConfiguration(secretEncryptionConfiguration);
+        ParameterClient parameterClient = new ParameterClient("token", authenticator);
         parameterClient.setSupportGetRequest(true);
         parameterClient.setSupportPostRequest(false);
 
