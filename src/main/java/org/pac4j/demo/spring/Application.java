@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -33,13 +34,24 @@ public class Application {
     @Value("${pac4j.centralLogout.logoutUrlPattern:#{null}}")
     private String logoutUrlPattern;
 
-    private LogoutController logoutController = new LogoutController();
+    private LogoutController logoutController;
 
     @Value("${salt}")
     private String salt;
 
     @Autowired
     private Config config;
+
+    @PostConstruct
+    protected void afterPropertiesSet() {
+        logoutController = new LogoutController();
+        logoutController.setDefaultUrl(defaultUrl);
+        logoutController.setLogoutUrlPattern(logoutUrlPattern);
+        logoutController.setLocalLogout(false);
+        logoutController.setCentralLogout(true);
+        logoutController.setConfig(config);
+        logoutController.setDestroySession(false);
+    }
 
     @RequestMapping("/")
     public String root(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws HttpAction {
@@ -50,6 +62,7 @@ public class Application {
     public String index(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws HttpAction {
         final WebContext context = new J2EContext(request, response);
         map.put("profiles", getProfiles(context));
+        map.put("sessionId", context.getSessionIdentifier());
         return "index";
     }
 
@@ -175,11 +188,6 @@ public class Application {
 
     @RequestMapping("/centralLogout")
     public void centralLogout(HttpServletRequest request, HttpServletResponse response) {
-        logoutController.setDefaultUrl(defaultUrl);
-        logoutController.setLogoutUrlPattern(logoutUrlPattern);
-        logoutController.setLocalLogout(false);
-        logoutController.setCentralLogout(true);
-        logoutController.setConfig(config);
         logoutController.logout(request, response);
     }
 }
