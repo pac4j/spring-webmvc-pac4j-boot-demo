@@ -23,6 +23,10 @@ import org.pac4j.saml.client.SAML2ClientConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+
+import java.io.File;
 
 @Configuration
 public class Pac4jConfig {
@@ -52,13 +56,13 @@ public class Pac4jConfig {
         final GoogleOidcClient oidcClient = new GoogleOidcClient(oidcConfiguration);
         oidcClient.setAuthorizationGenerator(profile -> profile.addRole("ROLE_ADMIN"));
 
-        final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration("resource:samlKeystore.jks",
+        final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration(new ClassPathResource("samlKeystore.jks"),
                 "pac4j-demo-passwd",
                 "pac4j-demo-passwd",
-                "resource:metadata-okta.xml");
+                new ClassPathResource("metadata-okta.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
         cfg.setServiceProviderEntityId("http://localhost:8080/callback?client_name=SAML2Client");
-        cfg.setServiceProviderMetadataPath("sp-metadata.xml");
+        cfg.setServiceProviderMetadataResource(new FileSystemResource(new File("sp-metadata.xml").getAbsoluteFile()));
         final SAML2Client saml2Client = new SAML2Client(cfg);
 
         final FacebookClient facebookClient = new FacebookClient("145278422258960", "be21409ba8f39b5dae2a7de525484da8");
