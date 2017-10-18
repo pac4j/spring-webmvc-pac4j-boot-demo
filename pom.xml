@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.pac4j.demo</groupId>
     <artifactId>spring-webmvc-pac4j-boot-demo</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>spring-webmvc-pac4j demo for Spring boot webapp</name>
 
@@ -28,8 +28,8 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <spring-webmvc-pac4j.version>2.0.0</spring-webmvc-pac4j.version>
-        <pac4j.version>2.0.0</pac4j.version>
+        <spring-webmvc-pac4j.version>2.1.0-SNAPSHOT</spring-webmvc-pac4j.version>
+        <pac4j.version>2.1.0</pac4j.version>
     </properties>
 
     <dependencies>
@@ -108,7 +108,12 @@
         </dependency>
         <dependency>
             <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-stormpath</artifactId>
+            <artifactId>pac4j-kerberos</artifactId>
+            <version>${pac4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-couch</artifactId>
             <version>${pac4j.version}</version>
         </dependency>
     </dependencies>
@@ -122,7 +127,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -131,7 +136,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.5.0</version>
+                <version>1.6.0</version>
                 <executions>
                     <execution>
                         <goals>
