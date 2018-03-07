@@ -4,6 +4,7 @@ import org.pac4j.core.client.Client;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
@@ -62,7 +63,7 @@ public class Application {
     public String index(HttpServletRequest request, HttpServletResponse response, Map<String, Object> map) throws HttpAction {
         final WebContext context = new J2EContext(request, response);
         map.put("profiles", getProfiles(context));
-        map.put("sessionId", context.getSessionIdentifier());
+        map.put("sessionId", context.getSessionStore().getOrCreateSessionId(context));
         return "index";
     }
 
@@ -172,7 +173,7 @@ public class Application {
     public String forceLogin(HttpServletRequest request, HttpServletResponse response) {
 
         final J2EContext context = new J2EContext(request, response);
-        final Client client = config.getClients().findClient(request.getParameter(Clients.DEFAULT_CLIENT_NAME_PARAMETER));
+        final Client client = config.getClients().findClient(request.getParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER));
         try {
             client.redirect(context);
         } catch (final HttpAction e) {
