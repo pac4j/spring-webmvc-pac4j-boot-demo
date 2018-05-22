@@ -46,7 +46,7 @@ public class Pac4jConfig {
         oidcConfiguration.addCustomParam("prompt", "consent");
         final OidcClient oidcClient = new OidcClient(oidcConfiguration);
         oidcClient.setName("test");
-        oidcClient.setCallbackUrl("http://localhost:8080/callback");*/
+        oidcClient.setCallbackUrl("http://localhost:8081/callback");*/
 
         final OidcConfiguration oidcConfiguration = new OidcConfiguration();
         oidcConfiguration.setClientId("167480702619-8e1lo80dnu8bpk3k0lvvj27noin97vu9.apps.googleusercontent.com");
@@ -59,9 +59,9 @@ public class Pac4jConfig {
         final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration(new ClassPathResource("samlKeystore.jks"),
                 "pac4j-demo-passwd",
                 "pac4j-demo-passwd",
-                new ClassPathResource("metadata-okta.xml"));
+                new ClassPathResource("cas-idp-metadata.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
-        cfg.setServiceProviderEntityId("http://localhost:8080/callback?client_name=SAML2Client");
+        cfg.setServiceProviderEntityId("http://localhost:8081/callback?client_name=SAML2Client");
         cfg.setServiceProviderMetadataResource(new FileSystemResource(new File("sp-metadata.xml").getAbsoluteFile()));
         final SAML2Client saml2Client = new SAML2Client(cfg);
 
@@ -69,7 +69,7 @@ public class Pac4jConfig {
         final TwitterClient twitterClient = new TwitterClient("CoxUiYwQOSFDReZYdjigBA",
                 "2kAzunH5Btc4gRSaMr7D7MkyoJ5u1VzbOOzE8rBofs");
         // HTTP
-        final FormClient formClient = new FormClient("http://localhost:8080/loginForm.jsp", new SimpleTestUsernamePasswordAuthenticator());
+        final FormClient formClient = new FormClient("http://localhost:8081/loginForm.jsp", new SimpleTestUsernamePasswordAuthenticator());
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
@@ -90,7 +90,7 @@ public class Pac4jConfig {
         // basic auth
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
-        final Clients clients = new Clients("http://localhost:8080/callback", oidcClient, saml2Client, facebookClient,
+        final Clients clients = new Clients("http://localhost:8081/callback", oidcClient, saml2Client, facebookClient,
                 twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient);
 
         final Config config = new Config(clients);
