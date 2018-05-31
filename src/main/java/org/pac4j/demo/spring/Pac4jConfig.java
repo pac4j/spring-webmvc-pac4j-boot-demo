@@ -6,6 +6,7 @@ import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.http.callback.PathParameterCallbackUrlResolver;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
@@ -61,9 +62,11 @@ public class Pac4jConfig {
                 "pac4j-demo-passwd",
                 new ClassPathResource("cas-idp-metadata.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
+        //cfg.setServiceProviderEntityId("http://localhost:8081/callback/myEntityId");
         cfg.setServiceProviderEntityId("http://localhost:8081/callback?client_name=SAML2Client");
         cfg.setServiceProviderMetadataResource(new FileSystemResource(new File("sp-metadata.xml").getAbsoluteFile()));
         final SAML2Client saml2Client = new SAML2Client(cfg);
+        //saml2Client.setCallbackUrlResolver(new PathParameterCallbackUrlResolver());
 
         final FacebookClient facebookClient = new FacebookClient("145278422258960", "be21409ba8f39b5dae2a7de525484da8");
         final TwitterClient twitterClient = new TwitterClient("CoxUiYwQOSFDReZYdjigBA",
