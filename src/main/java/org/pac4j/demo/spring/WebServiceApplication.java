@@ -4,7 +4,7 @@ import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.jwt.config.encryption.SecretEncryptionConfiguration;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
-import org.pac4j.springframework.helper.RestSecurityHelper;
+import org.pac4j.springframework.helper.WSSecurityHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -20,7 +20,7 @@ public class WebServiceApplication {
     private String salt;
 
     @Autowired
-    private RestSecurityHelper restSecurityHelper;
+    private WSSecurityHelper wsSecurityHelper;
 
     @RequestMapping("/dba/index.html")
     public String dba(final Map<String, Object> map) {
@@ -47,7 +47,7 @@ public class WebServiceApplication {
         String token = "";
         // by default, as we are in a REST API controller, profiles are retrieved only in the request
         // here, we retrieve the profile from the session as we generate the token from a profile saved by an indirect client (from the UserInterfaceApplication)
-        final Optional<CommonProfile> profile = restSecurityHelper.getProfile(true);
+        final Optional<CommonProfile> profile = wsSecurityHelper.getProfile(true);
         if (profile.isPresent()) {
             token = generator.generate(profile.get());
         }
@@ -56,7 +56,7 @@ public class WebServiceApplication {
     }
 
     protected String protectedIndex(final Map<String, Object> map) {
-        map.put("profiles", restSecurityHelper.getProfiles());
+        map.put("profiles", wsSecurityHelper.getProfiles());
         return "protectedIndex";
     }
 }
