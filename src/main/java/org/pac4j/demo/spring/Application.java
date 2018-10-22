@@ -5,9 +5,13 @@ import org.pac4j.core.config.Config;
 import org.pac4j.core.context.J2EContext;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.jwt.config.encryption.SecretEncryptionConfiguration;
+import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
+import org.pac4j.jwt.profile.JwtGenerator;
 import org.pac4j.springframework.annotation.ui.RequireAnyRole;
-import org.pac4j.springframework.helper.UISecurityHelper;
 import org.pac4j.springframework.web.LogoutController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,13 +21,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
-public class UserInterfaceApplication {
+public class Application {
+
+    @Value("${salt}")
+    private String salt;
 
     @Value("${pac4j.centralLogout.defaultUrl:#{null}}")
     private String defaultUrl;
@@ -35,13 +41,10 @@ public class UserInterfaceApplication {
     private Config config;
 
     @Autowired
-    private HttpServletRequest request;
+    private J2EContext webContext;
 
     @Autowired
-    private HttpServletResponse response;
-
-    @Autowired
-    private UISecurityHelper uiSecurityHelper;
+    private ProfileManager profileManager;
 
     private LogoutController logoutController;
 
@@ -63,9 +66,8 @@ public class UserInterfaceApplication {
 
     @RequestMapping("/index.html")
     public String index(final Map<String, Object> map) throws HttpAction {
-        map.put("profiles", uiSecurityHelper.getProfiles());
-        final J2EContext context = uiSecurityHelper.getJ2EContext();
-        map.put("sessionId", context.getSessionStore().getOrCreateSessionId(context));
+        map.put("profiles", profileManager.getAll(true));
+        map.put("sessionId", webContext.getSessionStore().getOrCreateSessionId(webContext));
         return "index";
     }
 
@@ -76,7 +78,7 @@ public class UserInterfaceApplication {
 
     @RequestMapping("/facebook/notprotected.html")
     public String facebookNotProtected(final Map<String, Object> map) {
-        map.put("profiles", uiSecurityHelper.getProfiles());
+        map.put("profiles", profileManager.getAll(true));
         return "notProtected";
     }
 
@@ -136,21 +138,55 @@ public class UserInterfaceApplication {
     @RequestMapping("/forceLogin")
     @ResponseBody
     public void forceLogin() {
-        final Client client = config.getClients().findClient(request.getParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER));
+        final Client client = config.getClients().findClient(webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER));
         try {
-            client.redirect(uiSecurityHelper.getJ2EContext());
+            client.redirect(webContext);
         } catch (final HttpAction e) {
         }
     }
 
     protected String protectedIndex(final Map<String, Object> map) {
-        map.put("profiles", uiSecurityHelper.getProfiles());
+        map.put("profiles", profileManager.getAll(true));
         return "protectedIndex";
     }
 
     @RequestMapping("/centralLogout")
+    @ResponseBody
     public void centralLogout() {
-        logoutController.logout(request, response);
+        logoutController.logout(webContext.getRequest(), webContext.getResponse());
+    }
+
+    @RequestMapping("/dba/index.html")
+    public String dba(final Map<String, Object> map) {
+        return protectedIndex(map);
+    }
+
+    @RequestMapping("/rest-jwt/index.html")
+    public String restJwt(final Map<String, Object> map) {
+        return protectedIndex(map);
+    }
+
+    @RequestMapping("/casrest/index.html")
+    public String casrest(final Map<String, Object> map) {
+        return protectedIndex(map);
+    }
+
+    @RequestMapping("/jwt.html")
+    public String jwt(final Map<String, Object> map) {
+        final SecretSignatureConfiguration secretSignatureConfiguration = new SecretSignatureConfiguration(salt);
+        final SecretEncryptionConfiguration secretEncryptionConfiguration = new SecretEncryptionConfiguration(salt);
+        final JwtGenerator generator = new JwtGenerator();
+        generator.setSignatureConfiguration(secretSignatureConfiguration);
+        generator.setEncryptionConfiguration(secretEncryptionConfiguration);
+        String token = "";
+        // by default, as we are in a REST API controller, profiles are retrieved only in the request
+        // here, we retrieve the profile from the session as we generate the token from a profile saved by an indirect client (from the UserInterfaceApplication)
+        final Optional<CommonProfile> profile = profileManager.get(true);
+        if (profile.isPresent()) {
+            token = generator.generate(profile.get());
+        }
+        map.put("token", token);
+        return "jwt";
     }
 
     @ExceptionHandler(HttpAction.class)
