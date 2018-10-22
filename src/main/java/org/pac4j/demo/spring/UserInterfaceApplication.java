@@ -149,6 +149,7 @@ public class UserInterfaceApplication {
     }
 
     @RequestMapping("/centralLogout")
+    @ResponseBody
     public void centralLogout() {
         logoutController.logout(request, response);
     }
