@@ -12,3 +12,5 @@ You can build the project and run it on [http://localhost:8080](http://localhost
     mvn clean compile exec:java
 
 For your tests, click on the "Protected url by **xxx**" link to start the login process with the **xxx** identity provider...
+
+curl -v -k -X POST --header "Content-Type:text/xml;charset=UTF-8" --data @logout-request.soap "https://localhost:8081/callback?client_name=SAML2Client&logoutendpoint=true"

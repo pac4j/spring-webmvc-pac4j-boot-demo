@@ -1,6 +1,7 @@
 package org.pac4j.demo.spring;
 
 import com.nimbusds.jose.JWSAlgorithm;
+import org.opensaml.saml.common.xml.SAMLConstants;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
@@ -21,6 +22,7 @@ import org.pac4j.oidc.client.GoogleOidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.client.SAML2ClientConfiguration;
+import org.pac4j.saml.config.SAML2Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,10 +62,15 @@ public class Pac4jConfig {
         final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration(new ClassPathResource("samlKeystore.jks"),
                 "pac4j-demo-passwd",
                 "pac4j-demo-passwd",
-                new ClassPathResource("cas-idp-metadata.xml"));
+                new ClassPathResource("cas-metadata.xml"));
+         //       new ClassPathResource("shibboleth-metadata.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
+        //cfg.setCas5Compatibility(false);
+        cfg.setSpLogoutRequestSigned(true);
+        //cfg.setAuthnRequestSigned(true);
+        //cfg.setSpLogoutRequestBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
         //cfg.setServiceProviderEntityId("http://localhost:8081/callback/myEntityId");
-        cfg.setServiceProviderEntityId("http://localhost:8081/callback?client_name=SAML2Client");
+        //cfg.setServiceProviderEntityId("http://localhost:8081/callback?client_name=SAML2Client");
         cfg.setServiceProviderMetadataResource(new FileSystemResource(new File("sp-metadata.xml").getAbsoluteFile()));
         final SAML2Client saml2Client = new SAML2Client(cfg);
         //saml2Client.setCallbackUrlResolver(new PathParameterCallbackUrlResolver());
@@ -76,7 +83,8 @@ public class Pac4jConfig {
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
-        final CasConfiguration configuration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
+        //final CasConfiguration configuration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
+        final CasConfiguration configuration = new CasConfiguration("https://localhost:8080/cas/login");
         final CasClient casClient = new CasClient(configuration);
         // casClient.setGateway(true);
 
@@ -93,7 +101,7 @@ public class Pac4jConfig {
         // basic auth
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
-        final Clients clients = new Clients("http://localhost:8081/callback", oidcClient, saml2Client, facebookClient,
+        final Clients clients = new Clients("http://localhost:8081/callback", saml2Client, facebookClient, //oidcClient,
                 twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient);
 
         final Config config = new Config(clients);
