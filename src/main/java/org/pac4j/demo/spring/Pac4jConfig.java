@@ -65,8 +65,7 @@ public class Pac4jConfig {
                 new ClassPathResource("cas-metadata.xml"));
          //       new ClassPathResource("shibboleth-metadata.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
-        //cfg.setCas5Compatibility(false);
-        cfg.setSpLogoutRequestSigned(true);
+        //cfg.setSpLogoutRequestSigned(true);
         //cfg.setAuthnRequestSigned(true);
         //cfg.setSpLogoutRequestBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
         //cfg.setServiceProviderEntityId("http://localhost:8081/callback/myEntityId");
