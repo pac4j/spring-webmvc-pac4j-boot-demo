@@ -65,7 +65,7 @@ public class Pac4jConfig {
                 new ClassPathResource("cas-metadata.xml"));
          //       new ClassPathResource("shibboleth-metadata.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
-        //cfg.setSpLogoutRequestSigned(true);
+        cfg.setSpLogoutRequestSigned(true);
         //cfg.setAuthnRequestSigned(true);
         //cfg.setSpLogoutRequestBindingType(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
         //cfg.setServiceProviderEntityId("http://localhost:8081/callback/myEntityId");
@@ -83,7 +83,7 @@ public class Pac4jConfig {
 
         // CAS
         //final CasConfiguration configuration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
-        final CasConfiguration configuration = new CasConfiguration("https://localhost:8080/cas/login");
+        final CasConfiguration configuration = new CasConfiguration("http://localhost:8080/cas/login");
         final CasClient casClient = new CasClient(configuration);
         // casClient.setGateway(true);
 
