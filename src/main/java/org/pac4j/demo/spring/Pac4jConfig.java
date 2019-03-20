@@ -3,7 +3,6 @@ package org.pac4j.demo.spring;
 import com.nimbusds.jose.JWSAlgorithm;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.config.CasConfiguration;
-import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
@@ -93,9 +92,6 @@ public class Pac4jConfig {
         final Clients clients = new Clients("http://localhost:8080/callback", oidcClient, saml2Client, facebookClient,
                 twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient);
 
-        final Config config = new Config(clients);
-        config.addAuthorizer("admin", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
-        config.addAuthorizer("custom", new CustomAuthorizer());
-        return config;
+        return new Config(clients);
     }
 }
