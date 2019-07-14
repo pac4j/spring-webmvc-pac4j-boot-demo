@@ -2,9 +2,9 @@ package org.pac4j.demo.spring;
 
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.J2EContext;
+import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.Pac4jConstants;
-import org.pac4j.core.exception.HttpAction;
+import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.http.client.indirect.FormClient;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,7 +40,7 @@ public class Application {
     private Config config;
 
     @Autowired
-    private J2EContext webContext;
+    private JEEContext webContext;
 
     @Autowired
     private ProfileManager profileManager;
@@ -129,8 +128,8 @@ public class Application {
     }
 
     @RequestMapping("/loginForm")
-    public String loginForm(final  Map<String, Object> map) {
-        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient");
+    public String loginForm(final Map<String, Object> map) {
+        final FormClient formClient = (FormClient) config.getClients().findClient("FormClient").get();
         map.put("callbackUrl", formClient.getCallbackUrl());
         return "form";
     }
@@ -138,8 +137,10 @@ public class Application {
     @RequestMapping("/forceLogin")
     @ResponseBody
     public void forceLogin() {
-        final Client client = config.getClients().findClient(webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER));
         try {
+            final String name = webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
+                .map(String::valueOf).orElse("");
+            final Client client = config.getClients().findClient(name).get();
             client.redirect(webContext);
         } catch (final HttpAction e) {
         }
@@ -153,7 +154,7 @@ public class Application {
     @RequestMapping("/centralLogout")
     @ResponseBody
     public void centralLogout() {
-        logoutController.logout(webContext.getRequest(), webContext.getResponse());
+        logoutController.logout(webContext.getNativeRequest(), webContext.getNativeResponse());
     }
 
     @RequestMapping("/dba/index.html")
