@@ -18,7 +18,7 @@ import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.saml.client.SAML2Client;
-import org.pac4j.saml.client.SAML2ClientConfiguration;
+import org.pac4j.saml.config.SAML2Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +26,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
+import java.util.Optional;
 
 @Configuration
 public class Pac4jConfig {
@@ -53,12 +54,15 @@ public class Pac4jConfig {
         oidcConfiguration.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
         oidcConfiguration.addCustomParam("prompt", "consent");
         final GoogleOidcClient oidcClient = new GoogleOidcClient(oidcConfiguration);
-        oidcClient.setAuthorizationGenerator((ctx, profile) -> { profile.addRole("ROLE_ADMIN"); return profile; });
+        oidcClient.setAuthorizationGenerator((ctx, profile) -> {
+            profile.addRole("ROLE_ADMIN");
+            return Optional.of(profile);
+        });
 
-        final SAML2ClientConfiguration cfg = new SAML2ClientConfiguration(new ClassPathResource("samlKeystore.jks"),
-                "pac4j-demo-passwd",
-                "pac4j-demo-passwd",
-                new ClassPathResource("metadata-okta.xml"));
+        final SAML2Configuration cfg = new SAML2Configuration(new ClassPathResource("samlKeystore.jks"),
+            "pac4j-demo-passwd",
+            "pac4j-demo-passwd",
+            new ClassPathResource("metadata-okta.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
         cfg.setServiceProviderEntityId("http://localhost:8080/callback?client_name=SAML2Client");
         cfg.setServiceProviderMetadataResource(new FileSystemResource(new File("sp-metadata.xml").getAbsoluteFile()));
@@ -66,7 +70,7 @@ public class Pac4jConfig {
 
         final FacebookClient facebookClient = new FacebookClient("145278422258960", "be21409ba8f39b5dae2a7de525484da8");
         final TwitterClient twitterClient = new TwitterClient("CoxUiYwQOSFDReZYdjigBA",
-                "2kAzunH5Btc4gRSaMr7D7MkyoJ5u1VzbOOzE8rBofs");
+            "2kAzunH5Btc4gRSaMr7D7MkyoJ5u1VzbOOzE8rBofs");
         // HTTP
         final FormClient formClient = new FormClient("http://localhost:8080/loginForm.jsp", new SimpleTestUsernamePasswordAuthenticator());
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
@@ -82,7 +86,7 @@ public class Pac4jConfig {
         final JwtAuthenticator authenticator = new JwtAuthenticator();
         authenticator.setSignatureConfiguration(secretSignatureConfiguration);
         authenticator.setEncryptionConfiguration(secretEncryptionConfiguration);
-        ParameterClient parameterClient = new ParameterClient("token", authenticator);
+        final ParameterClient parameterClient = new ParameterClient("token", authenticator);
         parameterClient.setSupportGetRequest(true);
         parameterClient.setSupportPostRequest(false);
 
@@ -90,7 +94,7 @@ public class Pac4jConfig {
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         final Clients clients = new Clients("http://localhost:8080/callback", oidcClient, saml2Client, facebookClient,
-                twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient);
+            twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient);
 
         return new Config(clients);
     }
