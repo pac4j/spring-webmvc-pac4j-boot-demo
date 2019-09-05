@@ -5,6 +5,7 @@ import org.pac4j.core.config.Config;
 import org.pac4j.core.context.JEEContext;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.exception.http.HttpAction;
+import org.pac4j.core.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.http.client.indirect.FormClient;
@@ -141,7 +142,7 @@ public class Application {
             final String name = webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
                 .map(String::valueOf).orElse("");
             final Client client = config.getClients().findClient(name).get();
-            client.redirect(webContext);
+            JEEHttpActionAdapter.INSTANCE.adapt((HttpAction) client.getRedirectionAction(webContext).get(), webContext);
         } catch (final HttpAction e) {
         }
     }
