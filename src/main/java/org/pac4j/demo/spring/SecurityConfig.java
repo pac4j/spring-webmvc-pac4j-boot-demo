@@ -51,6 +51,8 @@ public class SecurityConfig implements WebMvcConfigurer {
         registry.addInterceptor(new SecurityInterceptor(config)).addPathPatterns("/protected/*");
         registry.addInterceptor(buildInterceptor("DirectBasicAuthClient,ParameterClient")).addPathPatterns("/dba/*");
         registry.addInterceptor(buildInterceptor("ParameterClient")).addPathPatterns("/rest-jwt/*");
+
+        registry.addInterceptor(buildInterceptor("AnonymousClient")).addPathPatterns("/*").excludePathPatterns("/callback*");
     }
 
     private SecurityInterceptor buildInterceptor(final String client) {
