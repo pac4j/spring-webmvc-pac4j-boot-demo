@@ -17,6 +17,7 @@ import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
+import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
@@ -50,11 +51,10 @@ public class Pac4jConfig {
         oidcClient.setCallbackUrl("http://localhost:8080/callback");*/
 
         final OidcConfiguration oidcConfiguration = new OidcConfiguration();
-        oidcConfiguration.setClientId("167480702619-8e1lo80dnu8bpk3k0lvvj27noin97vu9.apps.googleusercontent.com");
-        oidcConfiguration.setSecret("MhMme_Ik6IH2JMnAT6MFIfee");
-        oidcConfiguration.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
-        oidcConfiguration.addCustomParam("prompt", "consent");
-        final GoogleOidcClient oidcClient = new GoogleOidcClient(oidcConfiguration);
+        oidcConfiguration.setClientId("client");
+        oidcConfiguration.setSecret("secret");
+        oidcConfiguration.setDiscoveryURI("http://localhost:8080/cas/oidc/.well-known");
+        final OidcClient oidcClient = new OidcClient(oidcConfiguration);
         oidcClient.setAuthorizationGenerator((ctx, profile) -> {
             profile.addRole("ROLE_ADMIN");
             return Optional.of(profile);
@@ -94,7 +94,7 @@ public class Pac4jConfig {
         // basic auth
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
-        final Clients clients = new Clients("http://localhost:8080/callback", oidcClient, saml2Client, facebookClient,
+        final Clients clients = new Clients("http://localhost:8081/callback", oidcClient, saml2Client, facebookClient,
             twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient, new AnonymousClient());
 
         return new Config(clients);

@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.pac4j.demo</groupId>
     <artifactId>spring-webmvc-pac4j-boot-demo</artifactId>
-    <version>4.0.0-RC3-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>spring-webmvc-pac4j demo for Spring boot webapp</name>
 
@@ -28,8 +28,8 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <spring-webmvc-pac4j.version>4.0.0-RC3-SNAPSHOT</spring-webmvc-pac4j.version>
-        <pac4j.version>4.0.0-RC3</pac4j.version>
+        <spring-webmvc-pac4j.version>4.0.0-SNAPSHOT</spring-webmvc-pac4j.version>
+        <pac4j.version>4.0.0-SNAPSHOT</pac4j.version>
     </properties>
 
     <dependencies>
