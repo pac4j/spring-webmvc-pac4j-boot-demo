@@ -142,7 +142,7 @@ public class Application {
             final String name = webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
                 .map(String::valueOf).orElse("");
             final Client client = config.getClients().findClient(name).get();
-            JEEHttpActionAdapter.INSTANCE.adapt((HttpAction) client.getRedirectionAction(webContext).get(), webContext);
+            JEEHttpActionAdapter.INSTANCE.adapt(client.getRedirectionAction(webContext).get(), webContext);
         } catch (final HttpAction e) {
         }
     }
