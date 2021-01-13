@@ -55,7 +55,7 @@ public class Pac4jConfig {
         oidcConfiguration.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
         oidcConfiguration.addCustomParam("prompt", "consent");
         final GoogleOidcClient oidcClient = new GoogleOidcClient(oidcConfiguration);
-        oidcClient.setAuthorizationGenerator((ctx, profile) -> {
+        oidcClient.setAuthorizationGenerator((ctx, session, profile) -> {
             profile.addRole("ROLE_ADMIN");
             return Optional.of(profile);
         });

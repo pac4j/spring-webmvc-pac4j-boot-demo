@@ -3,6 +3,7 @@ package org.pac4j.demo.spring;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.JEEContext;
+import org.pac4j.core.context.session.JEESessionStore;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.core.profile.ProfileManager;
@@ -67,7 +68,7 @@ public class Application {
     @RequestMapping("/index.html")
     public String index(final Map<String, Object> map) throws HttpAction {
         map.put("profiles", profileManager.getProfiles());
-        map.put("sessionId", webContext.getSessionStore().getSessionId(webContext, false).orElse("nosession"));
+        map.put("sessionId", JEESessionStore.INSTANCE.getSessionId(webContext, false).orElse("nosession"));
         return "index";
     }
 
@@ -142,7 +143,7 @@ public class Application {
             final String name = webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
                 .map(String::valueOf).orElse("");
             final Client client = config.getClients().findClient(name).get();
-            JEEHttpActionAdapter.INSTANCE.adapt(client.getRedirectionAction(webContext).get(), webContext);
+            JEEHttpActionAdapter.INSTANCE.adapt(client.getRedirectionAction(webContext, JEESessionStore.INSTANCE).get(), webContext);
         } catch (final HttpAction e) {
         }
     }
@@ -183,7 +184,7 @@ public class Application {
         String token = "";
         // by default, as we are in a REST API controller, profiles are retrieved only in the request
         // here, we retrieve the profile from the session as we generate the token from a profile saved by an indirect client (from the UserInterfaceApplication)
-        final Optional<UserProfile> profile = profileManager.get(true);
+        final Optional<UserProfile> profile = profileManager.getProfile();
         if (profile.isPresent()) {
             token = generator.generate(profile.get());
         }
