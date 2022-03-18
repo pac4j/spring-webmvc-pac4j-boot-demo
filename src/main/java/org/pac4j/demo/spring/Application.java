@@ -2,14 +2,14 @@ package org.pac4j.demo.spring;
 
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.context.JEEContext;
-import org.pac4j.core.context.session.JEESessionStore;
 import org.pac4j.core.exception.http.HttpAction;
-import org.pac4j.core.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
 import org.pac4j.core.util.Pac4jConstants;
 import org.pac4j.http.client.indirect.FormClient;
+import org.pac4j.jee.context.JEEContext;
+import org.pac4j.jee.context.session.JEESessionStore;
+import org.pac4j.jee.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.jwt.config.encryption.SecretEncryptionConfiguration;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;

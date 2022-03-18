@@ -3,7 +3,7 @@ package org.pac4j.demo.spring;
 import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.http.adapter.JEEHttpActionAdapter;
+import org.pac4j.jee.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.springframework.annotation.AnnotationConfig;
 import org.pac4j.springframework.component.ComponentConfig;
 import org.pac4j.springframework.web.SecurityInterceptor;
