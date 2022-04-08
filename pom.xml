@@ -29,7 +29,7 @@
     <properties>
         <java.version>11</java.version>
         <spring-webmvc-pac4j.version>6.0.1</spring-webmvc-pac4j.version>
-        <pac4j.version>5.4.0</pac4j.version>
+        <pac4j.version>5.4.2</pac4j.version>
     </properties>
 
     <dependencies>
