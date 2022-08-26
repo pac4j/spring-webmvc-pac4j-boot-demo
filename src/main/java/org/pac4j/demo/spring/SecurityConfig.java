@@ -1,6 +1,5 @@
 package org.pac4j.demo.spring;
 
-import org.pac4j.core.authorization.authorizer.Authorizer;
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.config.Config;
 import org.pac4j.jee.http.adapter.JEEHttpActionAdapter;
@@ -13,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
 @Configuration
 @Import({ComponentConfig.class, AnnotationConfig.class})
@@ -29,16 +29,14 @@ public class SecurityConfig implements WebMvcConfigurer {
             .excludePathPatterns("/facebook/notprotected.html");
 
         SecurityInterceptor interceptor = new SecurityInterceptor(config,
-            "FacebookClient",
-            new Authorizer[]{new RequireAnyRoleAuthorizer("ROLE_ADMIN")});
+            "FacebookClient", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
         interceptor.setHttpActionAdapter(JEEHttpActionAdapter.INSTANCE);
 
         registry.addInterceptor(interceptor).addPathPatterns("/facebookadmin/*");
         registry.addInterceptor(buildInterceptor("FacebookClient")).addPathPatterns("/facebookadmin/*");
 
         interceptor = new SecurityInterceptor(config,
-            "FacebookClient",
-            new Authorizer[]{new CustomAuthorizer()});
+            "FacebookClient", new CustomAuthorizer());
         interceptor.setHttpActionAdapter(JEEHttpActionAdapter.INSTANCE);
         
         registry.addInterceptor(interceptor).addPathPatterns("/facebookcustom/*");
