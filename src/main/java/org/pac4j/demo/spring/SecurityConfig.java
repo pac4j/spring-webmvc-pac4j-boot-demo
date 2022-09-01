@@ -28,14 +28,14 @@ public class SecurityConfig implements WebMvcConfigurer {
             .addPathPatterns("/facebook/*")
             .excludePathPatterns("/facebook/notprotected.html");
 
-        SecurityInterceptor interceptor = new SecurityInterceptor(config,
+        SecurityInterceptor interceptor = SecurityInterceptor.build(config,
             "FacebookClient", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
         interceptor.setHttpActionAdapter(JEEHttpActionAdapter.INSTANCE);
 
         registry.addInterceptor(interceptor).addPathPatterns("/facebookadmin/*");
         registry.addInterceptor(buildInterceptor("FacebookClient")).addPathPatterns("/facebookadmin/*");
 
-        interceptor = new SecurityInterceptor(config,
+        interceptor = SecurityInterceptor.build(config,
             "FacebookClient", new CustomAuthorizer());
         interceptor.setHttpActionAdapter(JEEHttpActionAdapter.INSTANCE);
         
