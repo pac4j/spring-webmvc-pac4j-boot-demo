@@ -14,5 +14,3 @@ You can build the project and run it on [http://localhost:8080](http://localhost
 or
 
     mvn spring-boot:run
-
-For your tests, click on the "Protected url by **xxx**" link to start the login process with the **xxx** identity provider...
