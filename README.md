@@ -2,9 +2,7 @@
   <img src="https://pac4j.github.io/pac4j/img/logo-spring-webmvc.png" width="300" />
 </p>
 
-This `spring-webmvc-pac4j-boot-demo` project is a Spring MVC boot demo using:
-- Spring MVC + Spring Boot
-- the [spring-webmvc-pac4j](https://github.com/pac4j/spring-webmvc-pac4j) security library
+This `spring-webmvc-pac4j-boot-demo` project is a Spring Boot application secured by the [spring-webmvc-pac4j](https://github.com/pac4j/spring-webmvc-pac4j) security library.
 
 ## Run and test
 
