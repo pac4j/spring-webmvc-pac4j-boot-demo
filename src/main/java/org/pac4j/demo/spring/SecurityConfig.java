@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
 @Configuration
 @Import({ComponentConfig.class, AnnotationConfig.class})
 @ComponentScan(basePackages = "org.pac4j.springframework.web")
@@ -54,6 +53,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
     private SecurityInterceptor buildInterceptor(final String client) {
-        return new SecurityInterceptor(config, client, JEEHttpActionAdapter.INSTANCE);
+        return SecurityInterceptor.build(config, client, JEEHttpActionAdapter.INSTANCE);
     }
 }
