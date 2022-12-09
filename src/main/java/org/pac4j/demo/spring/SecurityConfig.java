@@ -2,7 +2,6 @@ package org.pac4j.demo.spring;
 
 import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer;
 import org.pac4j.core.config.Config;
-import org.pac4j.jee.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.springframework.annotation.AnnotationConfig;
 import org.pac4j.springframework.component.ComponentConfig;
 import org.pac4j.springframework.web.SecurityInterceptor;
@@ -29,15 +28,13 @@ public class SecurityConfig implements WebMvcConfigurer {
 
         SecurityInterceptor interceptor = SecurityInterceptor.build(config,
             "FacebookClient", new RequireAnyRoleAuthorizer("ROLE_ADMIN"));
-        interceptor.setHttpActionAdapter(JEEHttpActionAdapter.INSTANCE);
 
         registry.addInterceptor(interceptor).addPathPatterns("/facebookadmin/*");
         registry.addInterceptor(buildInterceptor("FacebookClient")).addPathPatterns("/facebookadmin/*");
 
         interceptor = SecurityInterceptor.build(config,
             "FacebookClient", new CustomAuthorizer());
-        interceptor.setHttpActionAdapter(JEEHttpActionAdapter.INSTANCE);
-        
+
         registry.addInterceptor(interceptor).addPathPatterns("/facebookcustom/*");
         registry.addInterceptor(buildInterceptor("TwitterClient,FacebookClient")).addPathPatterns("/twitter/*");
         registry.addInterceptor(buildInterceptor("FormClient")).addPathPatterns("/form/*");
@@ -53,6 +50,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
     private SecurityInterceptor buildInterceptor(final String client) {
-        return SecurityInterceptor.build(config, client, JEEHttpActionAdapter.INSTANCE);
+        return SecurityInterceptor.build(config, client);
     }
 }
