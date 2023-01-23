@@ -2,10 +2,10 @@ package org.pac4j.demo.spring;
 
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.CallContext;
 import org.pac4j.core.exception.http.HttpAction;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.core.profile.UserProfile;
-import org.pac4j.core.profile.factory.ProfileManagerFactory;
 import org.pac4j.core.util.Pac4jConstants;
 import org.pac4j.http.client.indirect.FormClient;
 import org.pac4j.jee.context.JEEContext;
@@ -144,7 +144,7 @@ public class Application {
             final String name = webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
                 .map(String::valueOf).orElse("");
             final Client client = config.getClients().findClient(name).get();
-            JEEHttpActionAdapter.INSTANCE.adapt(client.getRedirectionAction(webContext, JEESessionStore.INSTANCE, ProfileManagerFactory.DEFAULT).get(), webContext);
+            JEEHttpActionAdapter.INSTANCE.adapt(client.getRedirectionAction(new CallContext(webContext, JEESessionStore.INSTANCE)).get(), webContext);
         } catch (final HttpAction e) {
         }
     }
