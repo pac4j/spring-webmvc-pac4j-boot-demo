@@ -69,7 +69,7 @@ public class Application {
     @RequestMapping("/index.html")
     public String index(final Map<String, Object> map) throws HttpAction {
         map.put("profiles", profileManager.getProfiles());
-        map.put("sessionId", JEESessionStore.INSTANCE.getSessionId(webContext, false).orElse("nosession"));
+        map.put("sessionId", new JEESessionStore().getSessionId(webContext, false).orElse("nosession"));
         return "index";
     }
 
@@ -144,7 +144,7 @@ public class Application {
             final String name = webContext.getRequestParameter(Pac4jConstants.DEFAULT_CLIENT_NAME_PARAMETER)
                 .map(String::valueOf).orElse("");
             final Client client = config.getClients().findClient(name).get();
-            JEEHttpActionAdapter.INSTANCE.adapt(client.getRedirectionAction(new CallContext(webContext, JEESessionStore.INSTANCE)).get(), webContext);
+            JEEHttpActionAdapter.INSTANCE.adapt(client.getRedirectionAction(new CallContext(webContext, new JEESessionStore())).get(), webContext);
         } catch (final HttpAction e) {
         }
     }
