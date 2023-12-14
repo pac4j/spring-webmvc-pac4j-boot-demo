@@ -26,9 +26,9 @@ public class MyErrorController extends BasicErrorController {
     @Override
     public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {
         final HttpStatus status = getStatus(request);
-        if (status == HttpStatus.UNAUTHORIZED) {
+        if (status.equals(HttpStatus.UNAUTHORIZED)) {
             return new ModelAndView("error401");
-        } else if (status == HttpStatus.FORBIDDEN) {
+        } else if (status.equals(HttpStatus.FORBIDDEN)) {
             return new ModelAndView("error403");
         } else {
             return new ModelAndView("error500");
