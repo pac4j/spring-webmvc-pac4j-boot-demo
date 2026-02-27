@@ -1,5 +1,6 @@
 package org.pac4j.demo.spring;
 
+import lombok.val;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.context.CallContext;
@@ -14,6 +15,7 @@ import org.pac4j.jee.http.adapter.JEEHttpActionAdapter;
 import org.pac4j.jwt.config.encryption.SecretEncryptionConfiguration;
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration;
 import org.pac4j.jwt.profile.JwtGenerator;
+import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.springframework.annotation.RequireAnyRole;
 import org.pac4j.springframework.web.LogoutController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +68,13 @@ public class Application {
         return index(map);
     }
 
+    @RequestMapping(value = "/.well-known/openid-federation") //, produces = DefaultEntityConfigurationGenerator.CONTENT_TYPE)
+    @ResponseBody
+    public String oidcFederation() throws HttpAction {
+        val oidcClient = (OidcClient) config.getClients().findClient("OidcClient").get();
+        return oidcClient.getConfiguration().getFederation().getEntityConfigurationGenerator().generate();
+    }
+
     @RequestMapping("/index.html")
     public String index(final Map<String, Object> map) throws HttpAction {
         map.put("profiles", profileManager.getProfiles());
@@ -90,42 +99,8 @@ public class Application {
         return protectedIndex(map);
     }
 
-    @RequestMapping("/facebookcustom/index.html")
-    public String facebookcustom(final Map<String, Object> map) {
-        return protectedIndex(map);
-    }
-
-    @RequestMapping("/twitter/index.html")
-    public String twitter(final Map<String, Object> map) {
-        return protectedIndex(map);
-    }
-
-    @RequestMapping("/form/index.html")
-    public String form(final Map<String, Object> map) {
-        return protectedIndex(map);
-    }
-
-    @RequestMapping("/basicauth/index.html")
-    public String basicauth(final Map<String, Object> map) {
-        return protectedIndex(map);
-    }
-
-    @RequestMapping("/cas/index.html")
-    public String cas(final Map<String, Object> map) {
-        return protectedIndex(map);
-    }
-
-    @RequestMapping("/saml/index.html")
-    public String saml(final Map<String, Object> map) {
-        return protectedIndex(map);
-    }
-
-    @RequestMapping("/oidc/index.html")
-    public String oidc(final Map<String, Object> map) {
-        return protectedIndex(map);
-    }
-
-    @RequestMapping("/protected/index.html")
+    @RequestMapping({"/facebookcustom/index.html", "/twitter/index.html", "/form/index.html", "/basicauth/index.html",
+            "/saml/index.html", "/cas/index.html", "/oidc/index.html", "/googleoidc/index.html", "/protected/index.html"})
     public String protect(final Map<String, Object> map) {
         return protectedIndex(map);
     }

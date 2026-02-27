@@ -1,6 +1,7 @@
 package org.pac4j.demo.spring;
 
 import com.nimbusds.jose.JWSAlgorithm;
+import lombok.val;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.core.client.Clients;
@@ -17,6 +18,7 @@ import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator;
 import org.pac4j.oauth.client.FacebookClient;
 import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
+import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
@@ -40,13 +42,34 @@ public class Pac4jConfig {
 
     @Bean
     public Config config() {
-        final OidcConfiguration oidcConfiguration = new OidcConfiguration();
-        oidcConfiguration.setClientId("167480702619-8e1lo80dnu8bpk3k0lvvj27noin97vu9.apps.googleusercontent.com");
-        oidcConfiguration.setSecret("MhMme_Ik6IH2JMnAT6MFIfee");
-        oidcConfiguration.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
-        oidcConfiguration.addCustomParam("prompt", "consent");
-        final GoogleOidcClient oidcClient = new GoogleOidcClient(oidcConfiguration);
-        oidcClient.setAuthorizationGenerator((ctx, profile) -> {
+        val oidcConfig = new OidcConfiguration();
+        oidcConfig.setDiscoveryURI("https://casserverpac4j.herokuapp.com/oidc/.well-known/openid-configuration");
+        oidcConfig.setClientId("myclient");
+        oidcConfig.setClientId("mysecret");
+        oidcConfig.setAllowUnsignedIdTokens(true);
+        val federation = oidcConfig.getFederation();
+
+        federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
+        federation.getJwks().setKid("mykeyoidcfede26");
+
+        //federation.getJwks().setJwksPath("file:/etc/cas/config/keystore.jwks");
+        //federation.getJwks().setKid("cas-JdlXLICH");
+
+        /*federation.getKeystore().setKeystorePath("file:./metadata/oidcfede.keystore");
+        federation.getKeystore().setKeystorePassword("changeit");
+        federation.getKeystore().setPrivateKeyPassword("changeit");*/
+
+        federation.setEntityId("http://localhost:" + serverPort);
+
+        val oidcClient = new OidcClient(oidcConfig);
+
+        val googleOidcConfiguration = new OidcConfiguration();
+        googleOidcConfiguration.setClientId("167480702619-8e1lo80dnu8bpk3k0lvvj27noin97vu9.apps.googleusercontent.com");
+        googleOidcConfiguration.setSecret("MhMme_Ik6IH2JMnAT6MFIfee");
+        googleOidcConfiguration.setPreferredJwsAlgorithm(JWSAlgorithm.PS384);
+        googleOidcConfiguration.addCustomParam("prompt", "consent");
+        val googleOidcClient = new GoogleOidcClient(googleOidcConfiguration);
+        googleOidcClient.setAuthorizationGenerator((ctx, profile) -> {
             profile.addRole("ROLE_ADMIN");
             return Optional.of(profile);
         });
@@ -57,7 +80,7 @@ public class Pac4jConfig {
             new ClassPathResource("metadata-okta.xml"));
         cfg.setMaximumAuthenticationLifetime(3600);
         cfg.setServiceProviderEntityId("http://localhost:" + serverPort + "/callback?client_name=SAML2Client");
-        cfg.setServiceProviderMetadataResource(new FileSystemResource(new File("sp-metadata.xml").getAbsoluteFile()));
+        cfg.setServiceProviderMetadataResource(new FileSystemResource(new File("./metadata/sp-metadata-" + serverPort + ".xml").getAbsoluteFile()));
         final SAML2Client saml2Client = new SAML2Client(cfg);
 
         final FacebookClient facebookClient = new FacebookClient("145278422258960", "be21409ba8f39b5dae2a7de525484da8");
@@ -86,8 +109,10 @@ public class Pac4jConfig {
         // basic auth
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
-        final Clients clients = new Clients("http://localhost:" + serverPort + "/callback", oidcClient, saml2Client, facebookClient,
-            twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient, new AnonymousClient());
+        final Clients clients = new Clients("http://localhost:" + serverPort + "/callback", googleOidcClient,
+                oidcClient,
+                saml2Client,
+                facebookClient, twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient, new AnonymousClient());
 
         return new Config(clients);
     }
