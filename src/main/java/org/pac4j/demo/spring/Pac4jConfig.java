@@ -20,6 +20,7 @@ import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
+import org.pac4j.oidc.federation.config.OidcTrustAnchorProperties;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,11 +44,20 @@ public class Pac4jConfig {
     @Bean
     public Config config() {
         val oidcConfig = new OidcConfiguration();
-        oidcConfig.setDiscoveryURI("https://casserverpac4j.herokuapp.com/oidc/.well-known/openid-configuration");
-        oidcConfig.setClientId("myclient");
-        oidcConfig.setClientId("mysecret");
-        oidcConfig.setAllowUnsignedIdTokens(true);
         val federation = oidcConfig.getFederation();
+
+        //oidcConfig.setDiscoveryURI("https://casserverpac4j.herokuapp.com/oidc/.well-known/openid-configuration");
+
+        federation.setTargetIssuer("http://localhost:" + serverPort + "/op");
+        val trust = new OidcTrustAnchorProperties();
+        trust.setTaIssuer("http://localhost:" + serverPort + "/ta");
+        trust.setTaJwksUrl("http://localhost:" + serverPort + "/ta/jwks.json");
+        federation.getTrustAnchors().add(trust);
+
+        oidcConfig.setClientId("myclient");
+        oidcConfig.setSecret("mysecret");
+
+        oidcConfig.setAllowUnsignedIdTokens(true);
 
         federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
         federation.getJwks().setKid("mykeyoidcfede26");
