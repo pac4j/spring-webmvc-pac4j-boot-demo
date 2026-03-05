@@ -1,12 +1,15 @@
 package org.pac4j.demo.spring;
 
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import lombok.val;
 import org.pac4j.cas.client.CasClient;
 import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.config.properties.JwksProperties;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
@@ -20,7 +23,9 @@ import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
+import org.pac4j.oidc.config.PrivateKeyJWTClientAuthnMethodConfig;
 import org.pac4j.oidc.federation.config.OidcTrustAnchorProperties;
+import org.pac4j.oidc.util.JwkHelper;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +35,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 @Configuration
@@ -42,7 +48,7 @@ public class Pac4jConfig {
     private String salt;
 
     @Bean
-    public Config config() {
+    public Config config() throws Exception {
         val oidcConfig = new OidcConfiguration();
         val federation = oidcConfig.getFederation();
 
@@ -54,6 +60,14 @@ public class Pac4jConfig {
         trust.setTaJwksUrl("http://localhost:" + serverPort + "/ta/jwks.json");
         federation.getTrustAnchors().add(trust);
 
+        oidcConfig.setClientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+        val jwksProperties = new JwksProperties();
+        jwksProperties.setJwksPath("classpath:/static/op/keystore.jwks");
+        jwksProperties.setKid("cas-qGcosGMN");
+        val signingKey = JwkHelper.loadCreateJwkFromJwks(jwksProperties);
+        val privateKeyJwtConfig = new PrivateKeyJWTClientAuthnMethodConfig(JWSAlgorithm.RS256, ((RSAKey) signingKey).toKeyPair().getPrivate(), "12345");
+        oidcConfig.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
+
         oidcConfig.setClientId("myclient");
         oidcConfig.setSecret("mysecret");
 
@@ -61,6 +75,8 @@ public class Pac4jConfig {
 
         federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
         federation.getJwks().setKid("mykeyoidcfede26");
+        federation.setClientName("Federated Test RP (Localhost)");
+        federation.setContacts(List.of("jerome@casinthecloud.com"));
 
         //federation.getJwks().setJwksPath("file:/etc/cas/config/keystore.jwks");
         //federation.getJwks().setKid("cas-JdlXLICH");
