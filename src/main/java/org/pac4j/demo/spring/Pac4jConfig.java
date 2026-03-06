@@ -64,7 +64,7 @@ public class Pac4jConfig {
         val jwksProperties = new JwksProperties();
         jwksProperties.setJwksPath("classpath:/static/op/keystore.jwks");
         jwksProperties.setKid("cas-qGcosGMN");
-        val signingKey = JwkHelper.loadCreateJwkFromJwks(jwksProperties);
+        val signingKey = JwkHelper.loadJwkFromOrCreateJwks(jwksProperties);
         val privateKeyJwtConfig = new PrivateKeyJWTClientAuthnMethodConfig(JWSAlgorithm.RS256, ((RSAKey) signingKey).toKeyPair().getPrivate(), "12345");
         oidcConfig.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
 

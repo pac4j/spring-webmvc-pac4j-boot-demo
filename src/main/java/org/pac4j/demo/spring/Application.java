@@ -181,7 +181,7 @@ public class Application {
         val jwksProperties = new JwksProperties();
         jwksProperties.setJwksPath("classpath:static/" + jwks);
         jwksProperties.setKid(kid);
-        return JwkHelper.loadCreateJwkFromJwks(jwksProperties);
+        return JwkHelper.loadJwkFromOrCreateJwks(jwksProperties);
     }
 
     private String getStaticFile(final String name) throws IOException {
