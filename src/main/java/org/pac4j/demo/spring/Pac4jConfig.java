@@ -47,46 +47,54 @@ public class Pac4jConfig {
     @Value("${salt}")
     private String salt;
 
+    private OidcConfiguration buildOidcConfiguration(final DemoOidcOpType type, final OidcConfiguration config) throws Exception {
+        if (type == DemoOidcOpType.CAS_HEROKU) {
+
+            config.setDiscoveryURI("https://casserverpac4j.herokuapp.com/oidc/.well-known/openid-configuration");
+            config.setClientId("myclient");
+            config.setSecret("mysecret");
+            config.setAllowUnsignedIdTokens(true);
+
+        } else if (type == DemoOidcOpType.FAKE_FEDERATED_LOCAL) {
+
+            val federation = config.getFederation();
+
+            federation.setTargetIssuer("http://localhost:" + serverPort + "/op");
+            val trust = new OidcTrustAnchorProperties();
+            trust.setTaIssuer("http://localhost:" + serverPort + "/ta");
+            trust.setTaJwksUrl("http://localhost:" + serverPort + "/ta/jwks.json");
+            federation.getTrustAnchors().add(trust);
+
+            config.setClientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+            val jwksProperties = new JwksProperties();
+            jwksProperties.setJwksPath("classpath:/static/op/keystore.jwks");
+            jwksProperties.setKid("cas-qGcosGMN");
+            val signingKey = JwkHelper.loadJwkFromOrCreateJwks(jwksProperties);
+            val privateKeyJwtConfig = new PrivateKeyJWTClientAuthnMethodConfig(JWSAlgorithm.RS256, ((RSAKey) signingKey).toKeyPair().getPrivate(), "12345");
+            config.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
+
+            config.setAllowUnsignedIdTokens(true);
+
+            federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
+            federation.getJwks().setKid("mykeyoidcfede26");
+            federation.setClientName("Federated Test RP (Localhost)");
+            federation.setContacts(List.of("jerome@casinthecloud.com"));
+
+            //federation.getJwks().setJwksPath("file:/etc/cas/config/keystore.jwks");
+            //federation.getJwks().setKid("cas-JdlXLICH");
+
+            /*federation.getKeystore().setKeystorePath("file:./metadata/oidcfede.keystore");
+            federation.getKeystore().setKeystorePassword("changeit");
+            federation.getKeystore().setPrivateKeyPassword("changeit");*/
+
+            federation.setEntityId("http://localhost:" + serverPort);
+        }
+        return config;
+    }
+
     @Bean
     public Config config() throws Exception {
-        val oidcConfig = new OidcConfiguration();
-        val federation = oidcConfig.getFederation();
-
-        //oidcConfig.setDiscoveryURI("https://casserverpac4j.herokuapp.com/oidc/.well-known/openid-configuration");
-
-        federation.setTargetIssuer("http://localhost:" + serverPort + "/op");
-        val trust = new OidcTrustAnchorProperties();
-        trust.setTaIssuer("http://localhost:" + serverPort + "/ta");
-        trust.setTaJwksUrl("http://localhost:" + serverPort + "/ta/jwks.json");
-        federation.getTrustAnchors().add(trust);
-
-        oidcConfig.setClientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT);
-        val jwksProperties = new JwksProperties();
-        jwksProperties.setJwksPath("classpath:/static/op/keystore.jwks");
-        jwksProperties.setKid("cas-qGcosGMN");
-        val signingKey = JwkHelper.loadJwkFromOrCreateJwks(jwksProperties);
-        val privateKeyJwtConfig = new PrivateKeyJWTClientAuthnMethodConfig(JWSAlgorithm.RS256, ((RSAKey) signingKey).toKeyPair().getPrivate(), "12345");
-        oidcConfig.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
-
-        oidcConfig.setClientId("myclient");
-        oidcConfig.setSecret("mysecret");
-
-        oidcConfig.setAllowUnsignedIdTokens(true);
-
-        federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
-        federation.getJwks().setKid("mykeyoidcfede26");
-        federation.setClientName("Federated Test RP (Localhost)");
-        federation.setContacts(List.of("jerome@casinthecloud.com"));
-
-        //federation.getJwks().setJwksPath("file:/etc/cas/config/keystore.jwks");
-        //federation.getJwks().setKid("cas-JdlXLICH");
-
-        /*federation.getKeystore().setKeystorePath("file:./metadata/oidcfede.keystore");
-        federation.getKeystore().setKeystorePassword("changeit");
-        federation.getKeystore().setPrivateKeyPassword("changeit");*/
-
-        federation.setEntityId("http://localhost:" + serverPort);
-
+        val oidcConfig = buildOidcConfiguration(DemoOidcOpType.FAKE_FEDERATED_LOCAL, new OidcConfiguration());
         val oidcClient = new OidcClient(oidcConfig);
 
         val googleOidcConfiguration = new OidcConfiguration();

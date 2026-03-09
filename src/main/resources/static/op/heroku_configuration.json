@@ -1,6 +1,7 @@
 {
   "issuer": "https://casserverpac4j.herokuapp.com/oidc",
-
+  "client_registration_types_supported": ["automatic"],
+  "federation_registration_endpoint": "http://localhost:$PORT/op/register",
   "dpopSigningAlgValuesSupported": [
     "RS256",
     "RS384",
