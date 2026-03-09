@@ -7,6 +7,6 @@ public class GenerateJwks {
         val jwksProperties = new JwksProperties();
         jwksProperties.setJwksPath("file:/Users/jleleu/pac4jecosystem/spring-webmvc-pac4j-boot-demo/src/main/resources/static/ta/jwks.json");
         jwksProperties.setKid("ta-key-1");
-        JwkHelper.loadCreateJwkFromJwks(jwksProperties);
+        JwkHelper.loadJwkFromOrCreateJwks(jwksProperties);
     }
 }
