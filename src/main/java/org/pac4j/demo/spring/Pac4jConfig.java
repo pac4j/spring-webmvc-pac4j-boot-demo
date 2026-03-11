@@ -10,6 +10,7 @@ import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
 import org.pac4j.core.config.properties.JwksProperties;
+import org.pac4j.core.util.JwkHelper;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
@@ -26,7 +27,6 @@ import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.config.PrivateKeyJWTClientAuthnMethodConfig;
 import org.pac4j.oidc.config.method.PrivateKeyJwtClientAuthnMethodConfig;
 import org.pac4j.oidc.federation.config.OidcTrustAnchorProperties;
-import org.pac4j.oidc.util.JwkHelper;
 import org.pac4j.saml.client.SAML2Client;
 import org.pac4j.saml.config.SAML2Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +39,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static org.pac4j.demo.spring.DemoOidcOpType.OPENIDFEDE_PLAN_TEST;
+import static org.pac4j.demo.spring.DemoOidcOpType.OIDCPLANTEST_FEDE;
 
 @Configuration
 public class Pac4jConfig {
@@ -50,10 +50,13 @@ public class Pac4jConfig {
     @Value("${salt}")
     private String salt;
 
-    private static final DemoOidcOpType type = OPENIDFEDE_PLAN_TEST;
+    private static final DemoOidcOpType type = OIDCPLANTEST_FEDE;
+
+    private static final String OIDC_ENV = "staging";
+    //private static final String OIDC_ENV = "www";
 
     private OidcConfiguration buildOidcConfiguration(final OidcConfiguration config) throws Exception {
-        if (type == OPENIDFEDE_PLAN_TEST) {
+        if (type == OIDCPLANTEST_FEDE) {
 
             val rpJwks = config.getRpJwks();
             rpJwks.setJwksPath("file:./metadata/rpjwks.jwks");
@@ -64,10 +67,10 @@ public class Pac4jConfig {
 
             val federation = config.getFederation();
 
-            federation.setTargetIssuer("https://www.certification.openid.net/test/a/rppac4j");
+            federation.setTargetIssuer("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede");
             val trust = new OidcTrustAnchorProperties();
-            trust.setTaIssuer("https://www.certification.openid.net/test/a/rppac4j/trust-anchor");
-            trust.setTaJwksUrl("http://localhost:" + serverPort + "/rppac4j/jwks.json");
+            trust.setTaIssuer("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede/trust-anchor");
+            trust.setTaJwksUrl("http://localhost:" + serverPort + "/rppac4jfede/jwks.json");
             federation.getTrustAnchors().add(trust);
 
             config.setAllowUnsignedIdTokens(true);
@@ -77,7 +80,6 @@ public class Pac4jConfig {
             federation.setClientName("Federated Test RP (Localhost)");
             federation.setContacts(List.of("jerome@casinthecloud.com"));
 
-            //federation.setEntityId("https://undanceable-flory-sina.ngrok-free.dev");
             federation.setEntityId("https://client.ngrok-free.dev");
 
         } else if (type == DemoOidcOpType.CAS_HEROKU) {
@@ -176,7 +178,7 @@ public class Pac4jConfig {
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         var callbackUrl = "http://localhost:" + serverPort + "/callback";
-        if (type == OPENIDFEDE_PLAN_TEST) {
+        if (type == OIDCPLANTEST_FEDE) {
             callbackUrl = "https://client.ngrok-free.dev/callback?client_name=OidcClient";
         }
         final Clients clients = new Clients(callbackUrl, googleOidcClient,

@@ -1,6 +1,6 @@
 import lombok.val;
 import org.pac4j.core.config.properties.JwksProperties;
-import org.pac4j.oidc.util.JwkHelper;
+import org.pac4j.core.util.JwkHelper;
 
 public class GenerateJwks {
     public static void main(String[] args) {
