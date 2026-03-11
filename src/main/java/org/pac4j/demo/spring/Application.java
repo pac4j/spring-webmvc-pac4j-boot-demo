@@ -75,7 +75,6 @@ public class Application {
     @ResponseBody
     public String oidcFederation() throws HttpAction {
         val oidcClient = (OidcClient) config.getClients().findClient("OidcClient").get();
-        oidcClient.init();
         return oidcClient.getConfiguration().getFederation().getEntityConfigurationGenerator().generate();
     }
 

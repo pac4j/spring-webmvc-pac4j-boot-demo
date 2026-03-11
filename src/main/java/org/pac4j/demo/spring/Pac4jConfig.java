@@ -24,6 +24,7 @@ import org.pac4j.oidc.client.GoogleOidcClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
 import org.pac4j.oidc.config.PrivateKeyJWTClientAuthnMethodConfig;
+import org.pac4j.oidc.config.method.PrivateKeyJwtClientAuthnMethodConfig;
 import org.pac4j.oidc.federation.config.OidcTrustAnchorProperties;
 import org.pac4j.oidc.util.JwkHelper;
 import org.pac4j.saml.client.SAML2Client;
@@ -38,6 +39,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
+import static org.pac4j.demo.spring.DemoOidcOpType.OPENIDFEDE_PLAN_TEST;
+
 @Configuration
 public class Pac4jConfig {
 
@@ -47,8 +50,37 @@ public class Pac4jConfig {
     @Value("${salt}")
     private String salt;
 
-    private OidcConfiguration buildOidcConfiguration(final DemoOidcOpType type, final OidcConfiguration config) throws Exception {
-        if (type == DemoOidcOpType.CAS_HEROKU) {
+    private static final DemoOidcOpType type = OPENIDFEDE_PLAN_TEST;
+
+    private OidcConfiguration buildOidcConfiguration(final OidcConfiguration config) throws Exception {
+        if (type == OPENIDFEDE_PLAN_TEST) {
+
+            val rpJwks = config.getRpJwks();
+            rpJwks.setJwksPath("file:./metadata/rpjwks.jwks");
+            rpJwks.setKid("defaultjwks0326");
+            config.setClientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+            val privateKeyJwtConfig = new PrivateKeyJwtClientAuthnMethodConfig(rpJwks);
+            config.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
+
+            val federation = config.getFederation();
+
+            federation.setTargetIssuer("https://www.certification.openid.net/test/a/rppac4j");
+            val trust = new OidcTrustAnchorProperties();
+            trust.setTaIssuer("https://www.certification.openid.net/test/a/rppac4j/trust-anchor");
+            trust.setTaJwksUrl("http://localhost:" + serverPort + "/rppac4j/jwks.json");
+            federation.getTrustAnchors().add(trust);
+
+            config.setAllowUnsignedIdTokens(true);
+
+            federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
+            federation.getJwks().setKid("mykeyoidcfede26");
+            federation.setClientName("Federated Test RP (Localhost)");
+            federation.setContacts(List.of("jerome@casinthecloud.com"));
+
+            //federation.setEntityId("https://undanceable-flory-sina.ngrok-free.dev");
+            federation.setEntityId("https://client.ngrok-free.dev");
+
+        } else if (type == DemoOidcOpType.CAS_HEROKU) {
 
             config.setDiscoveryURI("https://casserverpac4j.herokuapp.com/oidc/.well-known/openid-configuration");
             config.setClientId("myclient");
@@ -94,7 +126,7 @@ public class Pac4jConfig {
 
     @Bean
     public Config config() throws Exception {
-        val oidcConfig = buildOidcConfiguration(DemoOidcOpType.FAKE_FEDERATED_LOCAL, new OidcConfiguration());
+        val oidcConfig = buildOidcConfiguration(new OidcConfiguration());
         val oidcClient = new OidcClient(oidcConfig);
 
         val googleOidcConfiguration = new OidcConfiguration();
@@ -143,7 +175,11 @@ public class Pac4jConfig {
         // basic auth
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
-        final Clients clients = new Clients("http://localhost:" + serverPort + "/callback", googleOidcClient,
+        var callbackUrl = "http://localhost:" + serverPort + "/callback";
+        if (type == OPENIDFEDE_PLAN_TEST) {
+            callbackUrl = "https://client.ngrok-free.dev/callback?client_name=OidcClient";
+        }
+        final Clients clients = new Clients(callbackUrl, googleOidcClient,
                 oidcClient,
                 saml2Client,
                 facebookClient, twitterClient, formClient, indirectBasicAuthClient, casClient, parameterClient, directBasicAuthClient, new AnonymousClient());
