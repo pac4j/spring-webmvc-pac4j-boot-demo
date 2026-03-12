@@ -39,6 +39,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
+import static org.pac4j.demo.spring.DemoOidcOpType.CAS_HEROKU;
 import static org.pac4j.demo.spring.DemoOidcOpType.OIDCPLANTEST_FEDE;
 
 @Configuration
@@ -50,7 +51,8 @@ public class Pac4jConfig {
     @Value("${salt}")
     private String salt;
 
-    private static final DemoOidcOpType type = OIDCPLANTEST_FEDE;
+    //private static final DemoOidcOpType type = OIDCPLANTEST_FEDE;
+    private static final DemoOidcOpType type = CAS_HEROKU;
 
     private static final String OIDC_ENV = "staging";
     //private static final String OIDC_ENV = "www";
@@ -82,7 +84,7 @@ public class Pac4jConfig {
 
             federation.setEntityId("https://client.ngrok-free.dev");
 
-        } else if (type == DemoOidcOpType.CAS_HEROKU) {
+        } else if (type == CAS_HEROKU) {
 
             config.setDiscoveryURI("https://casserverpac4j.herokuapp.com/oidc/.well-known/openid-configuration");
             config.setClientId("myclient");
