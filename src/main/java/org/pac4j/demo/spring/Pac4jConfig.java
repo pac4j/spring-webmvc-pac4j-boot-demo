@@ -39,8 +39,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static org.pac4j.demo.spring.DemoOidcOpType.CAS_HEROKU;
-import static org.pac4j.demo.spring.DemoOidcOpType.OIDCPLANTEST_FEDE;
+import static org.pac4j.demo.spring.DemoOidcOpType.*;
 
 @Configuration
 public class Pac4jConfig {
@@ -51,14 +50,26 @@ public class Pac4jConfig {
     @Value("${salt}")
     private String salt;
 
-    //private static final DemoOidcOpType type = OIDCPLANTEST_FEDE;
-    private static final DemoOidcOpType type = CAS_HEROKU;
+    private static final DemoOidcOpType type = CAS_HEROKU; //OIDCPLANTEST_BASIC;
 
-    private static final String OIDC_ENV = "staging";
-    //private static final String OIDC_ENV = "www";
+    public static final String OIDC_ENV = "staging";
+    //public static final String OIDC_ENV = "www";
 
     private OidcConfiguration buildOidcConfiguration(final OidcConfiguration config) throws Exception {
-        if (type == OIDCPLANTEST_FEDE) {
+        if (type == OIDCPLANTEST_BASIC) {
+
+            config.setDiscoveryURI("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jbas/.well-known/openid-configuration");
+            config.setClientId("myclient");
+            config.setSecret("mysecret");
+            config.setUseNonce(true);
+            config.setAllowUnsignedIdTokens(true);
+            // for request_object:
+            /*config.setRequestObjectSigningAlgorithm(JWSAlgorithm.RS256);
+            val rpJwks = config.getRpJwks();
+            rpJwks.setJwksPath("file:./metadata/rpjwks.jwks");
+            rpJwks.setKid("defaultjwks0326");*/
+
+        } else if (type == OIDCPLANTEST_FEDE) {
 
             val rpJwks = config.getRpJwks();
             rpJwks.setJwksPath("file:./metadata/rpjwks.jwks");
@@ -180,7 +191,7 @@ public class Pac4jConfig {
         final DirectBasicAuthClient directBasicAuthClient = new DirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         var callbackUrl = "http://localhost:" + serverPort + "/callback";
-        if (type == OIDCPLANTEST_FEDE) {
+        if (type == OIDCPLANTEST_FEDE || type == OIDCPLANTEST_BASIC) {
             callbackUrl = "https://client.ngrok-free.dev/callback?client_name=OidcClient";
         }
         final Clients clients = new Clients(callbackUrl, googleOidcClient,
