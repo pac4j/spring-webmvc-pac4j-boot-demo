@@ -80,7 +80,7 @@ public class Pac4jConfig {
 
             val federation = config.getFederation();
 
-            federation.setTargetIssuer("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede");
+            federation.setTargetOp("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede");
             val trust = new OidcTrustAnchorProperties();
             trust.setTaIssuer("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede/trust-anchor");
             trust.setTaJwksUrl("http://localhost:" + serverPort + "/rppac4jfede/jwks.json");
@@ -106,7 +106,7 @@ public class Pac4jConfig {
 
             val federation = config.getFederation();
 
-            federation.setTargetIssuer("http://localhost:" + serverPort + "/op");
+            federation.setTargetOp("http://localhost:" + serverPort + "/op");
             val trust = new OidcTrustAnchorProperties();
             trust.setTaIssuer("http://localhost:" + serverPort + "/ta");
             trust.setTaJwksUrl("http://localhost:" + serverPort + "/ta/jwks.json");

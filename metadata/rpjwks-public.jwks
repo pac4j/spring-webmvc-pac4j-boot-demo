@@ -1,0 +1,9 @@
+{
+  "keys" : [ {
+    "kty" : "RSA",
+    "e" : "AQAB",
+    "use" : "sig",
+    "kid" : "defaultjwks0326",
+    "n" : "2moVQWw9fDRr891E9GWiCory0wA0QokXV9AQFPsqV9rQ_5kULyUcXyfyDyF5ixDGwFGBG8muxvx_T8991H4CVdJw3UyiAWso5qUyANqihXiwiUcxJ8MJZjhXDbvXo6sk2NHpsBON2jot-QQDg-2FIOFAaYW0D3vyu4nkortqSFvh09lxSbsfQzT5nMLyWUULafhdcC3KGqR3kUKyN0LUCHtSDmmAb7KGlx3_U8Ho80BiOrJ6oIu34WxyY9S572Iqen_rdysunMh5X1aGLtprN7UIBbiNFPg6-vkBu7rYW6T4U6sFoj1x2NmeROp2HM0KvhhI8_qO1_6t_Wk2_2aq7Q"
+  } ]
+}
