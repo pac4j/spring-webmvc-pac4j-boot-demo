@@ -1,7 +1,6 @@
 package org.pac4j.demo.spring;
 
 import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import lombok.val;
 import org.pac4j.cas.client.CasClient;
@@ -9,8 +8,6 @@ import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.client.direct.AnonymousClient;
 import org.pac4j.core.config.Config;
-import org.pac4j.core.config.properties.JwksProperties;
-import org.pac4j.core.util.JwkHelper;
 import org.pac4j.http.client.direct.DirectBasicAuthClient;
 import org.pac4j.http.client.direct.ParameterClient;
 import org.pac4j.http.client.indirect.FormClient;
@@ -24,7 +21,6 @@ import org.pac4j.oauth.client.TwitterClient;
 import org.pac4j.oidc.client.GoogleOidcClient;
 import org.pac4j.oidc.client.OidcClient;
 import org.pac4j.oidc.config.OidcConfiguration;
-import org.pac4j.oidc.config.PrivateKeyJWTClientAuthnMethodConfig;
 import org.pac4j.oidc.config.method.PrivateKeyJwtClientAuthnMethodConfig;
 import org.pac4j.oidc.federation.config.OidcTrustAnchorProperties;
 import org.pac4j.saml.client.SAML2Client;
@@ -90,8 +86,8 @@ public class Pac4jConfig {
 
             federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
             federation.getJwks().setKid("mykeyoidcfede26");
-            federation.setClientName("Federated Test RP (Localhost)");
-            federation.setContacts(List.of("jerome@casinthecloud.com"));
+            federation.setContactName("Federated Test RP (Localhost)");
+            federation.setContactEmails(List.of("jerome@casinthecloud.com"));
 
             federation.setEntityId("https://client.ngrok-free.dev");
 
@@ -112,20 +108,26 @@ public class Pac4jConfig {
             trust.setTaJwksUrl("http://localhost:" + serverPort + "/ta/jwks.json");
             federation.getTrustAnchors().add(trust);
 
+            val rpJwks = config.getRpJwks();
+            rpJwks.setJwksPath("file:./metadata/rpjwks.jwks");
+            rpJwks.setKid("defaultjwks0326");
             config.setClientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+            val privateKeyJwtConfig = new PrivateKeyJwtClientAuthnMethodConfig(rpJwks);
+            config.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
+            /*config.setClientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT);
             val jwksProperties = new JwksProperties();
             jwksProperties.setJwksPath("classpath:/static/op/keystore.jwks");
             jwksProperties.setKid("cas-qGcosGMN");
             val signingKey = JwkHelper.loadJwkFromOrCreateJwks(jwksProperties);
             val privateKeyJwtConfig = new PrivateKeyJWTClientAuthnMethodConfig(JWSAlgorithm.RS256, ((RSAKey) signingKey).toKeyPair().getPrivate(), "12345");
-            config.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
+            config.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);*/
 
             config.setAllowUnsignedIdTokens(true);
 
             federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
             federation.getJwks().setKid("mykeyoidcfede26");
-            federation.setClientName("Federated Test RP (Localhost)");
-            federation.setContacts(List.of("jerome@casinthecloud.com"));
+            federation.setContactName("Federated Test RP (Localhost)");
+            federation.setContactEmails(List.of("jerome@casinthecloud.com"));
 
             //federation.getJwks().setJwksPath("file:/etc/cas/config/keystore.jwks");
             //federation.getJwks().setKid("cas-JdlXLICH");
