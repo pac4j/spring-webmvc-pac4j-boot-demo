@@ -46,13 +46,45 @@ public class Pac4jConfig {
     @Value("${salt}")
     private String salt;
 
-    private static final DemoOidcOpType type = CAS_HEROKU; //OIDCPLANTEST_BASIC;
+    private static final DemoOidcOpType type = CAS_HEROKU; //CONNECT2ID_LOCAL_FAKE_TA;
 
     public static final String OIDC_ENV = "staging";
     //public static final String OIDC_ENV = "www";
 
     private OidcConfiguration buildOidcConfiguration(final OidcConfiguration config) throws Exception {
-        if (type == OIDCPLANTEST_BASIC) {
+        if (type == CONNECT2ID_LOCAL_FAKE_TA) {
+
+            val rpJwks = config.getRpJwks();
+            rpJwks.setJwksPath("file:./metadata/rpjwks.jwks");
+            rpJwks.setKid("defaultjwks0326");
+            config.setClientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT);
+            val privateKeyJwtConfig = new PrivateKeyJwtClientAuthnMethodConfig(rpJwks);
+            config.setPrivateKeyJWTClientAuthnMethodConfig(privateKeyJwtConfig);
+
+            config.setRequestObjectSigningAlgorithm(JWSAlgorithm.RS256);
+
+            val federation = config.getFederation();
+
+            federation.setTargetOp("http://127.0.0.1:8080/c2id");
+            val trust = new OidcTrustAnchorProperties();
+            trust.setIssuer("http://localhost:8081/trustanchor");
+            trust.setJwksPath("classpath:trustanchor.jwks");
+            federation.getTrustAnchors().add(trust);
+
+            federation.getJwks().setJwksPath("file:./metadata/oidcfede.jwks");
+            federation.getJwks().setKid("mykeyoidcfede26");
+            federation.setContactName("C2ID Test RP (Localhost)");
+            federation.setContactEmails(List.of("jerome@casinthecloud.com"));
+
+            federation.setEntityId("http://localhost:8081");
+
+        } else if (type == CONNECT2ID_LOCAL) {
+
+            config.setDiscoveryURI("http://127.0.0.1:8080/c2id/.well-known/openid-configuration");
+            config.setClientId("o56lf4akqwnd6");
+            config.setSecret("fgjfy6r-sl8lLv2Guc7YgwMeo1qPhDeX0WVwwbh2l1c");
+
+        } else if (type == OIDCPLANTEST_BASIC) {
 
             config.setDiscoveryURI("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jbas/.well-known/openid-configuration");
             config.setClientId("myclient");
@@ -78,8 +110,8 @@ public class Pac4jConfig {
 
             federation.setTargetOp("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede");
             val trust = new OidcTrustAnchorProperties();
-            trust.setTaIssuer("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede/trust-anchor");
-            trust.setTaJwksUrl("http://localhost:" + serverPort + "/rppac4jfede/jwks.json");
+            trust.setIssuer("https://" + OIDC_ENV + ".certification.openid.net/test/a/rppac4jfede/trust-anchor");
+            trust.setJwksPath("http://localhost:" + serverPort + "/rppac4jfede/jwks.json");
             federation.getTrustAnchors().add(trust);
 
             config.setAllowUnsignedIdTokens(true);
@@ -104,8 +136,8 @@ public class Pac4jConfig {
 
             federation.setTargetOp("http://localhost:" + serverPort + "/op");
             val trust = new OidcTrustAnchorProperties();
-            trust.setTaIssuer("http://localhost:" + serverPort + "/ta");
-            trust.setTaJwksUrl("http://localhost:" + serverPort + "/ta/jwks.json");
+            trust.setIssuer("http://localhost:" + serverPort + "/ta");
+            trust.setJwksPath("http://localhost:" + serverPort + "/ta/jwks.json");
             federation.getTrustAnchors().add(trust);
 
             val rpJwks = config.getRpJwks();

@@ -2,6 +2,10 @@ package org.pac4j.demo.spring;
 
 public enum DemoOidcOpType {
     CAS_HEROKU, FAKE_FEDERATED_LOCAL,
+
+    CONNECT2ID_LOCAL,
+    CONNECT2ID_LOCAL_FAKE_TA,
+
     OIDCPLANTEST_FEDE,
     OIDCPLANTEST_BASIC
 }

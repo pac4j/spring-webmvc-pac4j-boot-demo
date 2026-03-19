@@ -71,7 +71,7 @@ public class Application {
         return index(map);
     }
 
-    @RequestMapping(value = "/.well-known/openid-federation",  produces = FakeFederatedOp.TYPE)
+    @RequestMapping(value = "/.well-known/openid-federation",  produces = FakeFederation.TYPE)
     @ResponseBody
     public String oidcFederation() throws HttpAction {
         val oidcClient = (OidcClient) config.getClients().findClient("OidcClient").get();
