@@ -46,13 +46,13 @@ public class Pac4jConfig {
     @Value("${salt}")
     private String salt;
 
-    private static final DemoOidcOpType type = CAS_HEROKU; //CONNECT2ID_LOCAL_FAKE_TA;
+    private static final DemoOidcOpType type = CAS_HEROKU;
 
     public static final String OIDC_ENV = "staging";
     //public static final String OIDC_ENV = "www";
 
     private OidcConfiguration buildOidcConfiguration(final OidcConfiguration config) throws Exception {
-        if (type == CONNECT2ID_LOCAL_FAKE_TA) {
+        if (type == CONNECT2ID_LOCAL_FEDERATION_FAKE_TA) {
 
             val rpJwks = config.getRpJwks();
             rpJwks.setJwksPath("file:./metadata/rpjwks.jwks");
@@ -78,11 +78,15 @@ public class Pac4jConfig {
 
             federation.setEntityId("http://localhost:8081");
 
+            federation.setSendTrustChain(true);
+            config.setPushedAuthorizationRequest(true);
+
         } else if (type == CONNECT2ID_LOCAL) {
 
             config.setDiscoveryURI("http://127.0.0.1:8080/c2id/.well-known/openid-configuration");
             config.setClientId("o56lf4akqwnd6");
             config.setSecret("fgjfy6r-sl8lLv2Guc7YgwMeo1qPhDeX0WVwwbh2l1c");
+            config.setPushedAuthorizationRequest(true);
 
         } else if (type == OIDCPLANTEST_BASIC) {
 
