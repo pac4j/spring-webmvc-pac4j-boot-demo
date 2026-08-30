@@ -211,7 +211,7 @@ public class Pac4jConfig {
         final IndirectBasicAuthClient indirectBasicAuthClient = new IndirectBasicAuthClient(new SimpleTestUsernamePasswordAuthenticator());
 
         // CAS
-        final CasConfiguration configuration = new CasConfiguration("https://casserverpac4j.herokuapp.com/login");
+        final CasConfiguration configuration = new CasConfiguration("https://www.casserverpac4j.dev/login");
         final CasClient casClient = new CasClient(configuration);
         // casClient.setGateway(true);
 
